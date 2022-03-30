@@ -1,0 +1,218 @@
+<html>
+
+<head>
+    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+    <title>BELNETMON - Net Monitor in Belarus - Запыт</title>
+    <script language='JavaScript'>
+        function SelectAll() {
+            if (document.params.all.checked == true) {
+                document.getElementById('brest').checked = true;
+                document.getElementById('vitebsk').checked = true;
+                document.getElementById('gomel').checked = true;
+                document.getElementById('grodno').checked = true;
+                document.getElementById('mogilev').checked = true;
+                document.getElementById('mio').checked = true;
+                document.getElementById('minsk').checked = true;
+            }
+            else {
+                document.getElementById('brest').checked = false;
+                document.getElementById('vitebsk').checked = false;
+                document.getElementById('gomel').checked = false;
+                document.getElementById('grodno').checked = false;
+                document.getElementById('mogilev').checked = false;
+                document.getElementById('mio').checked = false;
+                document.getElementById('minsk').checked = false;
+            }
+        }
+
+        function SendForm() {
+            if (document.params.op_v.checked == false && document.params.op_m.checked == false && document.params.op_b.checked == false) {
+                alert('Абярыце аператара сувязi!');
+                document.params.op_v.focus();
+                return false;
+            }
+            if (document.params.brest.checked == false && document.params.vitebsk.checked == false && document.params.gomel.checked == false && document.params.grodno.checked == false && document.params.mogilev.checked == false && document.params.mio.checked == false && document.params.minsk.checked == false) {
+                alert('Абярыце рэгiён!');
+                document.params.brest.focus();
+                return false;
+            }
+            else return true;
+        }
+    </script>
+</head>
+
+<body bgcolor='white' style='background-color: #696969;'>
+
+    <table border='0' align='left'>
+        <tr>
+            <td align='center'>
+
+                <form name='params' method='post' onSubmit='return SendForm();'>
+
+                    <table border='0' cellspacing='1' cellpadding='1' bgcolor='A0A0A4' align='center' width='320pt'>
+                        <tr>
+                            <td bgcolor='#A0A0A4' colspan='3' style="font: 10pt 'Arial' ; color: white; font-weight:
+                                bold;"><b>1. Выбар праграмы:</b></td>
+                        </tr>
+                        <tr style="font: 10pt 'Arial' ; color: black;">
+                            <td bgcolor='FFFACD' width='90pt'>
+                                <input id='program' type='radio' name='program' value='gps'
+                                    tabindex='1'>&nbsp;-&nbsp;GPS Cell<br>
+                                <input id='program' type='radio' name='program' value='ct'>&nbsp;-&nbsp;CellTrack для
+                                Symbian OS (clf v2.0)<br>
+                                <input id='program' type='radio' name='program' value='andr'
+                                    checked>&nbsp;-&nbsp;Netmonitor для Android OS (clf v3.0)<br>
+                                <input id='program' type='radio' name='program'
+                                    value='cps'>&nbsp;-&nbsp;CellProfileSwitcher<br>
+                                <input id='program' type='radio' name='program' value='sgh'>&nbsp;-&nbsp;Extra Desktop
+                                патч для Samsung SGH
+                            </td>
+                        </tr>
+                    </table>
+                    <br>
+                    <table border='0' cellspacing='1' cellpadding='1' bgcolor='#A0A0A4' align='center' width='320pt'>
+                        <tr>
+                            <td bgcolor='#A0A0A4' colspan='3' style="font: 10pt 'Arial' ; color: white; font-weight:
+                            bold;"><b>2. Выбар аператара:</b>
+                            </td>
+                        </tr>
+                        <tr style="font: 10pt 'Arial' ; color: black;">
+                            <td bgcolor='#FFFACD' width='90pt'><input id='op_v' type='checkbox' name='op[v]'
+                                    tabindex='2' checked>&nbsp;-&nbsp;velcom&nbsp;</td>
+                            <td bgcolor='#FFFACD' width='90pt'><input id='op_m' type='checkbox' name='op[m]'
+                                    tabindex='3' checked>&nbsp;-&nbsp;МТС&nbsp;</td>
+                            <td bgcolor='#FFFACD' width='90pt'><input id='op_b' type='checkbox' name='op[b]'
+                                    tabindex='4' checked>&nbsp;-&nbsp;life:)</td>
+                        </tr>
+                    </table>
+                    <br>
+                    <table border='0' cellspacing='1' cellpadding='1' bgcolor='A0A0A4' align='center' width='320pt'>
+                        <tr>
+                            <td bgcolor='A0A0A4' colspan='2'
+                                style="font: 10pt 'Arial' ; color: white; font-weight: bold;">
+                                <b>3. Выбар рэгiёна:</b>
+                            </td>
+                        </tr>
+                        <tr valign='top' style="font: 10pt 'Arial' ; color: black;">
+                            <td bgcolor='FFFACD' width='135pt'><input id='brest' type='checkbox' name='reg[brest]'
+                                    tabindex='5' checked>&nbsp;-&nbsp;Брэсцкi<br>
+                                <input id='vitebsk' type='checkbox' name='reg[vitebsk]' tabindex='6'
+                                    checked>&nbsp;-&nbsp;Вiцебскi<br>
+                                <input id='gomel' type='checkbox' name='reg[gomel]' tabindex='7'
+                                    checked>&nbsp;-&nbsp;Гомельскi<br>
+                                <input id='grodno' type='checkbox' name='reg[grodno]' tabindex='8'
+                                    checked>&nbsp;-&nbsp;Гарадзенскi
+                            </td>
+                            <td bgcolor='FFFACD' width='135pt'><input id='mogilev' type='checkbox' name='reg[mogilev]'
+                                    tabindex='9' checked>&nbsp;-&nbsp;Магiлёўскi<br>
+                                <input id='mio' type='checkbox' name='reg[mio]' tabindex='10'
+                                    checked>&nbsp;-&nbsp;Менскi<br>
+                                <input id='minsk' type='checkbox' name='reg[minsk]' tabindex='11'
+                                    checked>&nbsp;-&nbsp;горад Менск<br>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <br>
+                    <table border='0' cellspacing='1' cellpadding='1' bgcolor='#A0A0A4' align='center' width='320pt'>
+                        <tr>
+                            <td bgcolor='#A0A0A4' colspan='2'
+                                style='font: 10pt Arial; color: white; font-weight: bold;'><b>4. Выбар дыапазона:</b>
+                            </td>
+                        </tr>
+                        <tr style="font: 10pt 'Arial' ; color: black;">
+                            <td bgcolor='#FFFACD' width='160pt'><input id='band2' type='checkbox' name='band2'
+                                    tabindex='21' checked>&nbsp;-&nbsp;2G&nbsp;</td>
+                            <td bgcolor='#FFFACD' width='160pt'><input id='band3' type='checkbox' name='band3'
+                                    tabindex='31' checked>&nbsp;-&nbsp;3G&nbsp;</td>
+                    </table>
+
+                    <br>
+                    <table border='0' cellspacing='1' cellpadding='1' bgcolor='#A0A0A4' align='center' width='320pt'>
+                        <tr>
+                            <td bgcolor='#A0A0A4' colspan='3'
+                                style='font: 10pt Arial; color: white; font-weight: bold;'><b>5. Дадаць WCDMA900:</b>
+                            </td>
+                        </tr>
+                        <tr style="font: 10pt 'Arial' ; color: black;">
+                            <td bgcolor='#FFFACD' width='90pt'><input id='bandu9' type='checkbox' name='u9'
+                                    tabindex='61' checked>&nbsp;-&nbsp;WCDMA900, для CellTrack i Netmonitor&nbsp;</td>
+                    </table>
+
+                    <br>
+                    <table border='0' cellspacing='1' cellpadding='1' bgcolor='#A0A0A4' align='center' width='320pt'>
+                        <tr>
+                            <td bgcolor='#A0A0A4' colspan='3'
+                                style='font: 10pt Arial; color: white; font-weight: bold;'><b>6. Дадаць LTE, толькi для
+                                    Android Netmotitor (clf v3.0): <input id='band4' type='checkbox' name='op[4]'
+                                        tabindex='51' checked></b></td>
+                        </tr>
+                        <tr style="font: 10pt 'Arial' ; color: black;">
+                        <tr>
+                            <td bgcolor='#FFFACD' width='90pt'><input id='band401' type='checkbox' name='lt1'
+                                    tabindex='52' checked>&nbsp;-&nbsp;ўключыць 25701 velcom&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td bgcolor='#FFFACD' width='90pt'><input id='band402' type='checkbox' name='lt2'
+                                    tabindex='52' checked>&nbsp;-&nbsp;ўключыць 25702 mts.by&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td bgcolor='#FFFACD' width='90pt'><input id='band404' type='checkbox' name='lt4'
+                                    tabindex='53' checked>&nbsp;-&nbsp;ўключыць 25704 life:)&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td bgcolor='#FFFACD' width='90pt'><input id='band406' type='checkbox' name='lt6'
+                                    tabindex='54'>&nbsp;-&nbsp;ўключыць 25706 BeCloud&nbsp;
+                        </tr>
+                    </table>
+
+                    <br>
+                    <table border='0' cellspacing='1' cellpadding='1' bgcolor='#A0A0A4' align='center' width='320pt'
+                        style='font: 10pt Arial; color: black;'>
+                        <tr>
+                        <tr>
+                            <td></td>
+                            <td><input type='checkbox' name='unite' tabindex='15' checked>&nbsp;-&nbsp;аб'яднаць у адзін
+                                файл (для 2х SIM, clf v3.0)</td>
+                        </tr>
+                        <td></td>
+                        <td><input type='checkbox' name='ext_sgh' tabindex='14'>&nbsp;-&nbsp;далучыць CID i LAC (толькi
+                            для Extra Desktop)</td>
+        </tr>
+        <td></td>
+        <td><input type='checkbox' name='oc_sel' tabindex='13'>&nbsp;-&nbsp;далучыць назву цэнтра вобласці</td>
+        </tr>
+        <td></td>
+        <td><input type='checkbox' name='unknown' tabindex='13'>&nbsp;-&nbsp;не выбіраць БС, дадзенныя па якiх дакладна
+            не вызначаны</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type='checkbox' name='arc' tabindex='14' checked>&nbsp;-&nbsp;спакаваць у ZIP</td>
+        </tr>
+    </table>
+    <br>
+    <input type='hidden' name='generate' value='1'>
+    <input type='submit' value='ЗАПАМПАВАЦЬ' tabindex='14' style="background-color: #191970; border: 1px #000000
+        outset; width: 120px; height: 24px; padding: 3px 2px; text-decoration: none; font: 10pt Arial; font-weight:
+        bold; color: white;">
+    </form>
+
+    </td>
+    </tr>
+    <tr>
+        <td>
+            <br>
+            <p align='left'><A HREF='http://belnetmon.bn.by/index.html'>На галоўную старонку...</A>
+        </td>
+    </tr>
+    </table>
+    <!-- Yandex.Metrika counter -->
+    <script
+        type='text/javascript'> (function (d, w, c) { (w[c] = w[c] || []).push(function () { try { w.yaCounter33876139 = new Ya.Metrika({ id: 33876139, clickmap: true, trackLinks: true, accurateTrackBounce: true, trackHash: true }); } catch (e) { } }); var n = d.getElementsByTagName('script')[0], s = d.createElement('script'), f = function () { n.parentNode.insertBefore(s, n); }; s.type = 'text/javascript'; s.async = true; s.src = 'https://mc.yandex.ru/metrika/watch.js'; if (w.opera == '[object Opera]') { d.addEventListener('DOMContentLoaded', f, false); } else { f(); } })(document, window, 'yandex_metrika_callbacks');</script>
+    <noscript>
+        <div><img src='https://mc.yandex.ru/watch/33876139' style='position:absolute; left:-9999px;' alt='' /></div>
+    </noscript><!-- /Yandex.Metrika counter -->
+</body>
+
+</html>
