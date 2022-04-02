@@ -187,6 +187,7 @@ function generate()
         if (file_exists("$mts"))    unlink("$mts");
         if (file_exists("$life"))   unlink("$life");
         if (file_exists("$lte"))    unlink("$lte");
+        if (file_exists("$unite"))  unlink("$unite");
 
         header('location: database.zip');        // отдаем пользователю архив с базами
     } else {

@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  generator:
+    build: ./generator
+    volumes:
+      - .:/var/www/html
+    ports:
+      - 80:80
