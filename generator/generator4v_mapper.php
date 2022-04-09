@@ -98,28 +98,23 @@ class Mapper
         return $result;
     }
 
+    function getAddedLeadingZerosString($str, $length)
+    {
+        return str_pad($str, $length, "0", STR_PAD_LEFT);
+    }
+
     function get2g($data, $opsos, $lac_dec2, $lac_hex2, $cid2, $sectors2, $lat, $lon, $city, $adrs, $prim)
     {
         $buffer = "";
-        if ($sectors2 !== '') {
-            for ($n = 0; $n < strlen($sectors2); $n++) {
-                if (strlen($buffer) > 2048576) {
-                    die("Переполнение буффера");
-                } // защита от пеперолнения буффера (максимум 1 Мб)
-                if (!is_numeric($sectors2[$n])) {
-                    continue;
-                }
-                if ($cid2 > 7000) {
-                    continue;
-                } //защита от БС 4G
-                $cell_dec2 = $cid2 . $sectors2[$n];
-                $cell_hex2 = strtoupper(dechex($cell_dec2)); // переводим dec в hex, и в верхний регистр
-                for ($i = strlen($cell_hex2); $i < 4; ++$i) {
-                    $cell_hex2 = "0" . $cell_hex2;
-                } // добавляем нули до длинны CID в 4 символа
-                for ($i = strlen($cell_dec2); $i < 5; ++$i) {
-                    $cell_dec2 = "0" . $cell_dec2;
-                } // добавляем нули до длинны CID в 4 символа
+        //защита от БС 4G
+        if ($sectors2 !== '' && $cid2 <= 7000) {
+            $sectorsArray = $this->getSectors($sectors2);
+            for ($i = 0; $i < count($sectorsArray); $i++) {
+                $sector = $sectorsArray[$i];
+                $cell_dec2 = $cid2 . $sector;
+                $cell_hex2 = strtoupper(dechex(intval($cell_dec2))); // переводим dec в hex, и в верхний регистр
+                $cell_hex2 = $this->getAddedLeadingZerosString($cell_hex2, 4);
+                $cell_dec2 = $this->getAddedLeadingZerosString($cell_dec2, 5);
 
                 switch ($_POST["program"] // для области
                 ) {
@@ -177,7 +172,7 @@ class Mapper
                             $ext_data =
                                 $cid2 .
                                 "." .
-                                $sectors2[$n] .
+                                $sector .
                                 "/" .
                                 (int) $lac_dec2 .
                                 " ";
@@ -198,7 +193,7 @@ class Mapper
                         #                                          $buffer.=pack("C8",0x00,0x00,0x00,0x00,0xD9,0x8B,0x36,0x7E);	// смысл не ясен!
                         break;
                 };
-            };
+            }
         }
         return $buffer;
     }
@@ -259,43 +254,24 @@ class Mapper
     function get3g($data, $opsos, $lac_dec3, $lac_hex3, $cid2, $cid3, $sectors3, $lat, $lon, $city, $adrs, $prim)
     {
         $buffer = "";
-        if ($sectors3 !== '') {
-            for ($n = 0; $n < strlen($sectors3); $n++) {
-                $prim1 = $prim;
-                if (strlen($buffer) > 2048576) {
-                    die("Переполнение буффера");
-                } // защита от пеперолнения буффера (максимум 1 Мб)
-                if (!is_numeric($sectors3[$n])) {
-                    continue;
-                }
-                $cell_dec3 = $cid3 . $sectors3[$n];
+        //защита от БС 4G
+        if ($sectors3 !== '' && $cid3 <= 7000) {
+            $sectorsArray = $this->getSectors($sectors3);
+            for ($i = 0; $i < count($sectorsArray); $i++) {
+                $sector = $sectorsArray[$i];
+                $cell_dec3 = $cid3 . $sector;
+                $cell_hex3 = strtoupper(dechex(intval($cell_dec3))); // переводим dec в hex, и в верхний регистр
+                $cell_hex3 = $this->getAddedLeadingZerosString($cell_hex3, 4);
+                $cell_dec3 = $this->getAddedLeadingZerosString($cell_dec3, 5);
 
+                $prim1 = $prim;
                 if ($cid2 != $cid3 and strlen($cid3) > 0) {
                     // выводим доп.комментарий для допов  (by Stalker)
-                    if (strlen($cid2) == 1) {
-                        $prim1 = $prim . " (000" . $cid2 . ")";
-                    }
-                    if (strlen($cid2) == 2) {
-                        $prim1 = $prim . " (00" . $cid2 . ")";
-                    }
-                    if (strlen($cid2) == 3) {
-                        $prim1 = $prim . " (0" . $cid2 . ")";
-                    }
-                    if (strlen($cid2) == 4) {
-                        $prim1 = $prim . " (" . $cid2 . ")";
+                    $length = strlen($cid2);
+                    if ($length >= 1 && $length <= 4) {
+                        $prim1 = $prim . " (" . $this->getAddedLeadingZerosString($cid2, 4) . ")";
                     }
                 }
-
-                if ($cell_dec3 > 70000) {
-                    continue;
-                }
-                $cell_hex3 = strtoupper(dechex($cell_dec3)); // переводим dec в hex, и в верхний регистр
-                for ($i = strlen($cell_hex3); $i < 4; ++$i) {
-                    $cell_hex3 = "0" . $cell_hex3;
-                } // добавляем нули до длинны CID в 4 символа
-                for ($i = strlen($cell_dec3); $i < 5; ++$i) {
-                    $cell_dec3 = "0" . $cell_dec3;
-                } // добавляем нули до длинны CID в 4 символа
 
                 switch ($_POST["program"] // для области
                 ) {
@@ -353,7 +329,7 @@ class Mapper
                             $ext_data =
                                 $cid3 .
                                 "." .
-                                $sectors3[$n] .
+                                $sector .
                                 "/" .
                                 (int) $lac_dec3 .
                                 " ";
@@ -443,40 +419,23 @@ class Mapper
     function getU900($data, $opsos, $lac_hexu9, $cid2, $cidu9, $sectorsu9, $lat, $lon, $city, $adrs, $prim)
     {
         $buffer = "";
-        if ($sectorsu9 !== '') {
-            for ($n = 0; $n < strlen($sectorsu9); $n++) {
-                $prim1 = $prim;
-                if (strlen($buffer) > 2048576) {
-                    die("Переполнение буффера");
-                } // защита от пеперолнения буффера (максимум 1 Мб)
-                if (!is_numeric($sectorsu9[$n])) {
-                    continue;
-                }
-                if ($cidu9 > 7000) {
-                    continue;
-                } //защита от БС 4G
-                $cell_decu9 = $cidu9 . $sectorsu9[$n]; //edit long_cell_id here
+        //защита от БС 4G
+        if ($sectorsu9 !== '' && $cidu9 <= 7000) {
+            $sectorsArray = $this->getSectors($sectorsu9);
+            for ($i = 0; $i < count($sectorsArray); $i++) {
+                $sector = $sectorsArray[$i];
+                $cell_decu9 = $cidu9 . $sector;
+                $cell_hexu9 = strtoupper(dechex(intval($cell_decu9))); // переводим dec в hex, и в верхний регистр
+                $cell_hexu9 = $this->getAddedLeadingZerosString($cell_hexu9, 4);
 
+                $prim1 = $prim;
                 if ($cid2 != $cidu9 and strlen($cidu9) > 0) {
                     // выводим доп.комментарий для допов  (by Stalker)
-                    if (strlen($cid2) == 1) {
-                        $prim1 = $prim . " (000" . $cid2 . ")";
-                    }
-                    if (strlen($cid2) == 2) {
-                        $prim1 = $prim . " (00" . $cid2 . ")";
-                    }
-                    if (strlen($cid2) == 3) {
-                        $prim1 = $prim . " (0" . $cid2 . ")";
-                    }
-                    if (strlen($cid2) == 4) {
-                        $prim1 = $prim . " (" . $cid2 . ")";
+                    $length = strlen($cid2);
+                    if ($length >= 1 && $length <= 4) {
+                        $prim1 = $prim . " (" . $this->getAddedLeadingZerosString($cid2, 4) . ")";
                     }
                 }
-
-                $cell_hexu9 = strtoupper(dechex($cell_decu9)); // переводим dec в hex, и в верхний регистр
-                for ($i = strlen($cell_hexu9); $i < 4; ++$i) {
-                    $cell_hexu9 = "0" . $cell_hexu9;
-                } // добавляем нули до длинны CID в 4 символа
 
                 switch ($_POST["program"]) {
                     case "andr":
@@ -540,11 +499,7 @@ class Mapper
             for ($i = 0; $i < count($sectorsArray); $i++) {
                 $sector = $sectorsArray[$i];
                 $cidHex = strtoupper(dechex(intval($cid) * 256 + $sector));
-
-                // добавляем нули до длинны CID в 4 символа
-                for ($j = strlen($cidHex); $j < 4; ++$j) {
-                    $cidHex = "0" . $cidHex;
-                }
+                $cidHex = $this->getAddedLeadingZerosString($cidHex, 4);
 
                 if ($_POST["lt1"] == true) {
                     $buffer .= $this->getClf30HexLine("25701", $lacHex, $cidHex, $lat, $lon, $info);

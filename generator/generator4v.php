@@ -113,18 +113,18 @@ function generate()
 
                 // для LAC 2G
                 $lac_hex2 = strtoupper(dechex(intval($lac_dec2)));            // переводим dec в hex, и в верхний регистр
-                for ($i = strlen($lac_hex2); $i < 4; ++$i) $lac_hex2 = '0' . $lac_hex2;    // добавляем нули до длинны LAC в 4 символа
-                for ($i = strlen($lac_dec2); $i < 5; ++$i) $lac_dec2 = '0' . $lac_dec2;    // добавляем нули до длинны LAC в 4 символа
+                $lac_hex2 = $mapper->getAddedLeadingZerosString($lac_hex2, 4);
+                $lac_dec2 = $mapper->getAddedLeadingZerosString($lac_dec2, 5);
 
                 // для LAC 3G
                 $lac_hex3 = strtoupper(dechex(intval($lac_dec3)));            // переводим dec в hex, и в верхний регистр
-                for ($i = strlen($lac_hex3); $i < 4; ++$i) $lac_hex3 = '0' . $lac_hex3;    // добавляем нули до длинны LAC в 4 символа
-                for ($i = strlen($lac_dec3); $i < 5; ++$i) $lac_dec3 = '0' . $lac_dec3;    // добавляем нули до длинны LAC в 4 символа
+                $lac_hex3 = $mapper->getAddedLeadingZerosString($lac_hex3, 4);
+                $lac_dec3 = $mapper->getAddedLeadingZerosString($lac_dec3, 5);
 
                 // для LAC U900
                 $lac_hexu9 = strtoupper(dechex(intval($lac_decu9)));            // переводим dec в hex, и в верхний регистр
-                for ($i = strlen($lac_hexu9); $i < 4; ++$i) $lac_hexu9 = '0' . $lac_hexu9;    // добавляем нули до длинны LAC в 4 символа
-                for ($i = strlen($lac_decu9); $i < 5; ++$i) $lac_decu9 = '0' . $lac_decu9;    // добавляем нули до длинны LAC в 4 символа
+                $lac_hexu9 = $mapper->getAddedLeadingZerosString($lac_hexu9, 4);
+                $lac_decu9 = $mapper->getAddedLeadingZerosString($lac_decu9, 5);
 
                 if ($_POST['unknown'] == TRUE and ($city == '' or strpbrk($city, '?'))) continue;    // защита от БС с неизвестным нас.пунктом
 
