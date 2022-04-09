@@ -72,7 +72,7 @@ class Mapper
             for ($i = 0; $i < count($testSplitted); $i++) {
                 $str = $testSplitted[$i];
                 if ($i == 0) {
-                    if (!empty($str)) {
+                    if ($str !== '') {
                         $arr = str_split($str);
                         for ($j = 0; $j < count($arr); $j++) {
                             $sector = $arr[$j];
@@ -81,11 +81,11 @@ class Mapper
                             }
                         }
                     }
-                } else if (!empty($str) and is_numeric($str)) {
+                } else if ($str !== '' and is_numeric($str)) {
                     array_push($result, intval($str));
                 }
             }
-        } else if (!empty($test)) {
+        } else if ($test !== '') {
             $str = str_replace(' ', '', $test);
             $arr = str_split($str);
             for ($j = 0; $j < count($arr); $j++) {
@@ -101,7 +101,7 @@ class Mapper
     function get2g($data, $opsos, $lac_dec2, $lac_hex2, $cid2, $sectors2, $lat, $lon, $city, $adrs, $prim)
     {
         $buffer = "";
-        if (!empty($sectors2)) {
+        if ($sectors2 !== '') {
             for ($n = 0; $n < strlen($sectors2); $n++) {
                 if (strlen($buffer) > 2048576) {
                     die("Переполнение буффера");
@@ -259,7 +259,7 @@ class Mapper
     function get3g($data, $opsos, $lac_dec3, $lac_hex3, $cid2, $cid3, $sectors3, $lat, $lon, $city, $adrs, $prim)
     {
         $buffer = "";
-        if (!empty($sectors3)) {
+        if ($sectors3 !== '') {
             for ($n = 0; $n < strlen($sectors3); $n++) {
                 $prim1 = $prim;
                 if (strlen($buffer) > 2048576) {
@@ -443,7 +443,7 @@ class Mapper
     function getU900($data, $opsos, $lac_hexu9, $cid2, $cidu9, $sectorsu9, $lat, $lon, $city, $adrs, $prim)
     {
         $buffer = "";
-        if (!empty($sectorsu9)) {
+        if ($sectorsu9 !== '') {
             for ($n = 0; $n < strlen($sectorsu9); $n++) {
                 $prim1 = $prim;
                 if (strlen($buffer) > 2048576) {
@@ -535,7 +535,7 @@ class Mapper
     function getLte($lacHex, $cid, $sectors, $lat, $lon, $info, $limitSectors)
     {
         $buffer = "";
-        if (!empty($sectors)) {
+        if ($sectors !== '') {
             $sectorsArray = $this->getSectors($sectors);
             for ($i = 0; $i < count($sectorsArray); $i++) {
                 $sector = $sectorsArray[$i];
