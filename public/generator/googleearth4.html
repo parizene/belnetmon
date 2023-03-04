@@ -1,0 +1,237 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>BELNETMON - Net Monitor in Belarus - Запыт</title>
+    <script language="JavaScript">
+      function SelectAll() {
+        if (document.params.all.checked == true) {
+          document.getElementById("op_v").checked = true;
+          document.getElementById("op_m").checked = true;
+          document.getElementById("op_b").checked = true;
+          document.getElementById("op_4").checked = true;
+          document.getElementById("brest").checked = true;
+          document.getElementById("vitebsk").checked = true;
+          document.getElementById("gomel").checked = true;
+          document.getElementById("grodno").checked = true;
+          document.getElementById("mogilev").checked = true;
+          document.getElementById("mio").checked = true;
+          document.getElementById("minsk").checked = true;
+        } else {
+          document.getElementById("op_v").checked = false;
+          document.getElementById("op_m").checked = false;
+          document.getElementById("op_b").checked = false;
+          document.getElementById("op_4").checked = false;
+          document.getElementById("brest").checked = false;
+          document.getElementById("vitebsk").checked = false;
+          document.getElementById("gomel").checked = false;
+          document.getElementById("grodno").checked = false;
+          document.getElementById("mogilev").checked = false;
+          document.getElementById("mio").checked = false;
+          document.getElementById("minsk").checked = false;
+        }
+      }
+      function SendForm() {
+        if (
+          document.params.op_v.checked == false &&
+          document.params.op_m.checked == false &&
+          document.params.op_b.checked == false &&
+          document.params.op_4.checked == false
+        ) {
+          alert("Абярыце аператара сувязi!");
+          document.params.op_v.focus();
+          return false;
+        }
+        if (
+          document.params.brest.checked == false &&
+          document.params.vitebsk.checked == false &&
+          document.params.gomel.checked == false &&
+          document.params.grodno.checked == false &&
+          document.params.mogilev.checked == false &&
+          document.params.mio.checked == false &&
+          document.params.minsk.checked == false
+        ) {
+          alert("Абярыце рэгiён!");
+          document.params.brest.focus();
+          return false;
+        } else return true;
+      }
+    </script>
+  </head>
+  <body
+    bgcolor="#ffffff"
+    style="background-color: #f0f0ff"
+    onload="document.params.op_v.focus();"
+  >
+    <table border="0" align="left">
+      <tr>
+        <td align="center">
+          <form name="params" method="post" onsubmit="return SendForm();">
+            <table
+              border="0"
+              cellspacing="1"
+              cellpadding="1"
+              bgcolor="#0000b0"
+              align="center"
+              width="400pt"
+            >
+              <tr>
+                <td
+                  bgcolor="#0000b0"
+                  colspan="3"
+                  style="font: 10pt 'Arial'; color: white; font-weight: bold"
+                >
+                  <b>Выбар аператара:</b>
+                </td>
+              </tr>
+              <tr style="font: 10pt 'Arial'; color: black">
+                <td bgcolor="#F0F0FF" width="20%">
+                  <input
+                    id="op_v"
+                    type="checkbox"
+                    name="op[v]"
+                    tabindex="1"
+                  />&nbsp;-&nbsp;A1&nbsp;
+                </td>
+                <td bgcolor="#F0F0FF" width="20%">
+                  <input
+                    id="op_m"
+                    type="checkbox"
+                    name="op[m]"
+                    tabindex="2"
+                  />&nbsp;-&nbsp;МТС&nbsp;
+                </td>
+                <td bgcolor="#F0F0FF" width="20%">
+                  <input
+                    id="op_b"
+                    type="checkbox"
+                    name="op[b]"
+                    tabindex="3"
+                  />&nbsp;-&nbsp;life:)
+                </td>
+                <td bgcolor="#F0F0FF" width="40%">
+                  <input
+                    id="op_4"
+                    type="checkbox"
+                    name="op[4]"
+                    tabindex="4"
+                  />&nbsp;-&nbsp;beCloud (LTE)
+                </td>
+              </tr>
+            </table>
+
+            <br />
+
+            <table
+              border="0"
+              cellspacing="1"
+              cellpadding="1"
+              bgcolor="#0000b0"
+              align="center"
+              width="400pt"
+            >
+              <tr>
+                <td
+                  bgcolor="#0000b0"
+                  colspan="2"
+                  style="font: 10pt 'Arial'; color: white; font-weight: bold"
+                >
+                  <b>Выбар рэгiёна:</b>
+                </td>
+              </tr>
+              <tr valign="top" style="font: 10pt 'Arial'; color: black">
+                <td bgcolor="#F0F0FF" width="50%">
+                  <input
+                    id="brest"
+                    type="checkbox"
+                    name="reg[brest]"
+                    tabindex="5"
+                  />&nbsp;-&nbsp;Брэсцкi<br />
+                  <input
+                    id="vitebsk"
+                    type="checkbox"
+                    name="reg[vitebsk]"
+                    tabindex="6"
+                  />&nbsp;-&nbsp;Вiцебскi<br />
+                  <input
+                    id="gomel"
+                    type="checkbox"
+                    name="reg[gomel]"
+                    tabindex="7"
+                  />&nbsp;-&nbsp;Гомельскi<br />
+                  <input
+                    id="grodno"
+                    type="checkbox"
+                    name="reg[grodno]"
+                    tabindex="8"
+                  />&nbsp;-&nbsp;Гарадзенскi
+                </td>
+                <td bgcolor="F0F0FF" width="50%">
+                  <input
+                    id="mogilev"
+                    type="checkbox"
+                    name="reg[mogilev]"
+                    tabindex="9"
+                  />&nbsp;-&nbsp;Магiлёўскi<br />
+                  <input
+                    id="mio"
+                    type="checkbox"
+                    name="reg[mio]"
+                    tabindex="10"
+                  />&nbsp;-&nbsp;Менскi<br />
+                  <input
+                    id="minsk"
+                    type="checkbox"
+                    name="reg[minsk]"
+                    tabindex="11"
+                  />&nbsp;-&nbsp;горад Менск<br />
+                </td>
+              </tr>
+            </table>
+
+            <br />
+
+            <table
+              border="0"
+              cellspacing="1"
+              cellpadding="1"
+              bgcolor="#f0f0ff"
+              align="center"
+              width="400pt"
+            >
+              <tr>
+                <td style="font: 10pt 'Arial'; color: black">
+                  <input
+                    type="checkbox"
+                    name="all"
+                    tabindex="12"
+                    onClick="SelectAll();"
+                  />&nbsp;-&nbsp;вылучыць усё
+                </td>
+              </tr>
+            </table>
+
+            <br />
+
+            <input type="hidden" name="generate" value="on" />
+            <input
+              type="submit"
+              tabindex="13"
+              value="ЗАПАМПАВАЦЬ"
+              style="
+                background-color: #0000b0;
+                border: 1px #0000b0 outset;
+                width: 120px;
+                height: 24px;
+                padding: 3px 2px;
+                text-decoration: none;
+                font: 10pt Arial;
+                font-weight: bold;
+                color: white;
+              "
+            />
+          </form>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

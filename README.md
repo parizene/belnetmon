@@ -1,4 +1,4 @@
-# [belnetmon](http://belnetmon.bn.by/generator/generator4v.php)
+# [belnetmon](https://belnetmon.bn.by)
 
 ```console
 docker-compose build
