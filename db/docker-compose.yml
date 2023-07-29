@@ -1,0 +1,17 @@
+version: "3"
+services:
+  belnetmon-db:
+    image: postgres:15.3-alpine
+    container_name: belnetmon-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=belnetmon
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - belnetmon-db-data:/var/lib/postgresql/data
+volumes:
+  belnetmon-db-data:
+    driver: local

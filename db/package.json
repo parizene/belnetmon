@@ -1,0 +1,26 @@
+{
+  "name": "db",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "validate": "ts-node src/validate.ts",
+    "populate": "ts-node src/populate.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fast-csv/parse": "^4.3.6",
+    "@prisma/client": "^5.0.0",
+    "chalk": "^4.1.2",
+    "csvtojson": "^2.0.10",
+    "date-fns": "^2.30.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.14.5",
+    "prisma": "^5.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
+  }
+}
