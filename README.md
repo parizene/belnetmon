@@ -23,18 +23,15 @@ check for invalid data:
 ```
 npm run validate
 ```
+start docker:
 ```
-docker-compose up -d
-```
-create tables:
-```
-npx prisma migrate dev --name init
+make up-prod
 ```
 populate with data from csv files:
 ```
 npm run populate
 ```
-view db
+view db in pgAdmin
 ```
-npx prisma studio
+http://localhost:5050/
 ```

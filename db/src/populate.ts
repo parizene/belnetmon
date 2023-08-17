@@ -1,64 +1,195 @@
-import { PrismaClient } from "@prisma/client";
+import { format } from "@fast-csv/format";
 import fs from "fs";
+import MultiStream from "multistream";
 import path from "path";
-const chalk = require("chalk");
+import { Client } from "pg";
+import { from as copyFrom } from "pg-copy-streams";
+import { Transform } from "stream";
 
-import { CsvDataModel } from "./csv-data-model";
-import { getDate, getSectors, parseCsv } from "./csv-helper";
+import { getCsvParseStream, getDate, getSectors } from "./csv-helper";
 import { parseStringToNumber } from "./utils";
 
-const prisma = new PrismaClient();
+const db = new Client({
+  database: "belnetmon",
+  host: "localhost",
+  port: 5432,
+  user: "postgres",
+  password: "postgres",
+});
 
-const main = async () => {
-  const dir = "./csv";
-  const files = await fs.promises.readdir(dir, { withFileTypes: true });
-  for (const file of files) {
-    console.log(chalk.blue(file.name));
-    const filePath = path.join(dir, file.name);
+db.connect()
+  .then(async () => {
+    await main();
+    shutdown();
+  })
+  .catch((err) => {
+    console.warn(err);
+    shutdown(1);
+  });
 
-    let rows: CsvDataModel[] = [];
-    try {
-      rows = await parseCsv(filePath);
-      console.log(`parsed ${rows.length} rows`);
-    } catch (error) {
-      console.error(error);
-    }
-
-    await prisma.cell.createMany({
-      data: rows.map((row) => ({
-        operator: row.OPR,
-        area: row.AREA,
-        city: row.CITY,
-        cb: row.CB,
-        lac: parseStringToNumber(row.LAC),
-        cid: parseStringToNumber(row.CID),
-        sectors_gsm: getSectors(row.GSM),
-        sectors_dcs: getSectors(row.DCS),
-        lac_3g: parseStringToNumber(row["3G L"]),
-        cid_3g: parseStringToNumber(row["3G C"]),
-        sectors_3g: getSectors(row["3G S"]),
-        lac_u900: parseStringToNumber(row["U-L"]),
-        cid_u900: parseStringToNumber(row.U900),
-        sectors_u900: getSectors(row["U-S"]),
-        date: getDate(row.DATE),
-        address: row.ADDR,
-        remark: row.REM,
-        latitude: parseStringToNumber(row.OZIN),
-        longitude: parseStringToNumber(row.OZIE),
-      })),
+const shutdown = (exitCode = 0) => {
+  db.end()
+    .then(() => {
+      process.exit(exitCode);
+    })
+    .catch((err) => {
+      console.warn(err);
+      process.exit(1);
     });
-  }
-
-  const count = await prisma.cell.count();
-  console.log(`populated ${count} cells`);
 };
 
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
+
+const getStream = (filename: string) => {
+  const parseTransformStream = getCsvParseStream().transform((row: any) => {
+    return {
+      operator: row.OPR,
+      area: row.AREA,
+      city: row.CITY,
+      cb: row.CB,
+      lac: parseStringToNumber(row.LAC),
+      cid: parseStringToNumber(row.CID),
+      sectors_gsm: getSectors(row.GSM),
+      sectors_dcs: getSectors(row.DCS),
+      lac_3g: parseStringToNumber(row["3G L"]),
+      cid_3g: parseStringToNumber(row["3G C"]),
+      sectors_3g: getSectors(row["3G S"]),
+      lac_u900: parseStringToNumber(row["U-L"]),
+      cid_u900: parseStringToNumber(row.U900),
+      sectors_u900: getSectors(row["U-S"]),
+      date: getDate(row.DATE),
+      address: row.ADDR,
+      remark: row.REM,
+      latitude: parseStringToNumber(row.OZIN),
+      longitude: parseStringToNumber(row.OZIE),
+    };
   });
+  const formatStream = format({ headers: false, delimiter: ";" });
+  return fs
+    .createReadStream(filename)
+    .pipe(parseTransformStream)
+    .pipe(formatStream);
+};
+
+const addNewlineTransform = () =>
+  new Transform({
+    transform(chunk, encoding, callback) {
+      this.push(chunk);
+      callback();
+    },
+    flush(callback) {
+      this.push("\n");
+      callback();
+    },
+  });
+
+const copy = async (sql: string) => {
+  const t1 = performance.now();
+
+  const dir = "./csv";
+  const files = await fs.promises.readdir(dir, { withFileTypes: true });
+  const csvFiles = files
+    .filter((file) => file.isFile() && file.name.endsWith(".csv"))
+    .map((file) => path.join(dir, file.name));
+  const streams = csvFiles.map((filename) =>
+    getStream(filename).pipe(addNewlineTransform())
+  );
+
+  const combinedStream = new MultiStream(streams);
+  const outputStream = db.query(copyFrom(sql));
+
+  await new Promise((resolve, reject) => {
+    combinedStream.pipe(outputStream).on("finish", resolve).on("error", reject);
+  });
+
+  console.info(`copy: ${performance.now() - t1}ms`);
+};
+
+const exists = async (): Promise<boolean> => {
+  const res = await db.query(
+    "SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'cell');"
+  );
+  return res.rows[0].exists;
+};
+
+const main = async () => {
+  if (await exists()) {
+    console.info("already exists");
+    return;
+  }
+
+  try {
+    await db.query("BEGIN");
+
+    try {
+      await db.query(`
+        CREATE TABLE cell (
+          id SERIAL PRIMARY KEY,
+          operator TEXT NOT NULL,
+          area TEXT NOT NULL,
+          city TEXT,
+          cb TEXT,
+          lac INTEGER,
+          cid INTEGER,
+          sectors_gsm INTEGER[],
+          sectors_dcs INTEGER[],
+          lac_3g INTEGER,
+          cid_3g INTEGER,
+          sectors_3g INTEGER[],
+          lac_u900 INTEGER,
+          cid_u900 INTEGER,
+          sectors_u900 INTEGER[],
+          date DATE,
+          address TEXT,
+          remark TEXT,
+          latitude REAL,
+          longitude REAL,
+          location geography(Point, 4326)
+        );
+      `);
+
+      await db.query(`
+        CREATE FUNCTION cell_location_fn() RETURNS TRIGGER AS
+        $$
+        BEGIN
+          IF NEW.latitude IS NOT NULL AND NEW.longitude IS NOT NULL THEN
+            NEW.location := geography(ST_SetSRID(ST_MakePoint(NEW.longitude, NEW.latitude), 4326));
+          ELSE
+            NEW.location := NULL;
+          END IF;
+          RETURN NEW;
+        END;
+        $$
+        LANGUAGE plpgsql;
+      `);
+
+      await db.query(`
+        CREATE TRIGGER cell_location_tr
+        BEFORE INSERT OR UPDATE OF latitude, longitude ON cell
+        FOR EACH ROW EXECUTE FUNCTION cell_location_fn();
+      `);
+
+      try {
+        await copy(`
+          COPY cell (operator, area, city, cb, lac, cid, sectors_gsm, sectors_dcs, lac_3g, cid_3g, sectors_3g, lac_u900, cid_u900, sectors_u900, date, address, remark, latitude, longitude)
+          FROM STDIN
+          WITH CSV DELIMITER ';';
+        `);
+      } catch (error) {
+        console.warn(error);
+      }
+
+      await db.query(
+        "CREATE INDEX cell_location_idx ON cell USING GIST (location);"
+      );
+
+      await db.query("COMMIT");
+    } catch (error) {
+      await db.query("ROLLBACK");
+      throw error;
+    }
+  } catch (error) {
+    console.warn(error);
+  }
+};

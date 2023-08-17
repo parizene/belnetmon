@@ -1,0 +1,4 @@
+version: "3"
+services:
+  belnetmon-db:
+    image: postgis/postgis:15-3.3-alpine

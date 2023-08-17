@@ -1,5 +1,5 @@
-import { ParserOptionsArgs, parse } from "@fast-csv/parse";
-import { isValid, parse as parseDate } from "date-fns";
+import { parse } from "@fast-csv/parse";
+import { format, isValid, parse as parseDate } from "date-fns";
 import fs from "fs";
 
 import { CsvDataModel } from "./csv-data-model";
@@ -67,18 +67,21 @@ export const isLocationValid = (obj: CsvDataModel) => {
   );
 };
 
-export const getDate = (dateText: string): Date | undefined => {
+export const getDate = (dateText: string): string | undefined => {
   let parsedDate = parseDate(dateText, "dd.MM.yy", new Date());
+
   if (isValid(parsedDate)) {
-    return parsedDate;
+    return format(parsedDate, "yyyy-MM-dd");
   }
+
   parsedDate = parseDate(dateText, "yyyy", new Date());
+
   if (isValid(parsedDate)) {
-    return parsedDate;
+    return format(parsedDate, "yyyy-MM-dd");
   }
 };
 
-export const getSectors = (sectorsText: string): number[] => {
+export const getSectors = (sectorsText: string): string => {
   const result: number[] = [];
   const parts = sectorsText.replace(/\s+/g, "").split(":");
   parts.forEach((part, index) => {
@@ -88,23 +91,25 @@ export const getSectors = (sectorsText: string): number[] => {
       );
     }
   });
-  return result;
+  return "{" + result.join(",") + "}";
+};
+
+export const getCsvParseStream = () => {
+  return parse({
+    delimiter: ";",
+    ignoreEmpty: true,
+    trim: true,
+    comment: "/",
+    quote: null,
+    headers: true,
+  });
 };
 
 export const parseCsv = async (filePath: string): Promise<CsvDataModel[]> => {
   return new Promise((resolve, reject) => {
     const rows: CsvDataModel[] = [];
-    const options: ParserOptionsArgs = {
-      delimiter: ";",
-      ignoreEmpty: true,
-      trim: true,
-      comment: "/",
-      quote: null,
-      headers: true,
-    };
-
     fs.createReadStream(filePath)
-      .pipe(parse(options))
+      .pipe(getCsvParseStream())
       .on("error", reject)
       .on("data", (row: CsvDataModel) => rows.push(row))
       .on("end", () => resolve(rows));
