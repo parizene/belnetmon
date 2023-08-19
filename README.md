@@ -10,28 +10,28 @@ docker-compose up -d
 ```
 cd db/
 ```
-place downloaded csv files in `csv` folder
 
-migrate to utf-8:
+Place downloaded csv files in `csv` folder.
+
+Migrate csv files to utf-8, validate data:
 ```
+cd scripts
 ./unicode.sh
+python validate.py
 ```
-```
-npm install
-```
-check for invalid data:
-```
-npm run validate
-```
-start docker:
+
+Run docker container with database:
 ```
 make up-prod
 ```
-populate with data from csv files:
+
+Populate database with data from csv files:
 ```
+npm install
 npm run populate
 ```
-view db in pgAdmin
+
+Url to view database in pgAdmin:
 ```
 http://localhost:5050/
 ```
