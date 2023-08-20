@@ -1,0 +1,36 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis]
+}
+
+model cell {
+  id           Int                       @id @default(autoincrement())
+  operator     String
+  area         String
+  city         String?
+  cb           String?
+  lac          Int?
+  cid          Int?
+  sectors_gsm  Int[]
+  sectors_dcs  Int[]
+  lac_3g       Int?
+  cid_3g       Int?
+  sectors_3g   Int[]
+  lac_u900     Int?
+  cid_u900     Int?
+  sectors_u900 Int[]
+  date         DateTime?                 @db.Date
+  address      String?
+  remark       String?
+  latitude     Float?                    @db.Real
+  longitude    Float?                    @db.Real
+  location     Unsupported("geography")?
+
+  @@index([location], name: "cell_location_idx", type: Gist)
+}

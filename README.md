@@ -1,9 +1,18 @@
 # [belnetmon](https://belnetmon.bn.by)
 
-## legacy
+## app
 ```
-cd legacy/
-docker-compose up -d
+cd app/
+```
+
+Create `.env` file:
+```
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/belnetmon?schema=public"
+```
+
+Build:
+```
+prisma generate && next build
 ```
 
 ## db
@@ -34,4 +43,10 @@ npm run populate
 Url to view database in pgAdmin:
 ```
 http://localhost:5050/
+```
+
+## legacy
+```
+cd legacy/
+docker-compose up -d
 ```
