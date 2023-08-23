@@ -1,10 +1,11 @@
 "use client";
 
+import { Cluster } from "@/types/cluster";
 import { OperatorKey } from "@/types/operator";
 import React, { createContext, useCallback, useEffect, useState } from "react";
 
 type MapContextType = {
-  clusters: any[];
+  clusters: Cluster[];
   operators: Record<OperatorKey, boolean>;
   onMapZoomBoundsChange: (zoomBounds: ZoomBounds) => void;
   onOperatorCheck: (operator: OperatorKey, checked: boolean) => void;
@@ -18,7 +19,7 @@ type ZoomBounds = {
 };
 
 export const MapProvider = ({ children }: { children: React.ReactNode }) => {
-  const [clusters, setClusters] = useState<any[]>([]);
+  const [clusters, setClusters] = useState<Cluster[]>([]);
   const [zoomBounds, setZoomBounds] = useState<ZoomBounds | null>(null);
   const [operators, setOperators] = useState<Record<OperatorKey, boolean>>({
     M: false,
@@ -38,13 +39,13 @@ export const MapProvider = ({ children }: { children: React.ReactNode }) => {
         [operator]: checked,
       }));
     },
-    []
+    [],
   );
 
   const fetchClusters = async (
     zoom: number,
     bbox: number[],
-    operators: string[]
+    operators: string[],
   ) => {
     let url = `/api/clusters?bbox=${bbox.join(",")}&zoom=${zoom}`;
     if (operators.length) {
@@ -68,7 +69,7 @@ export const MapProvider = ({ children }: { children: React.ReactNode }) => {
     };
   };
 
-  const debouncedFetch = debounce(fetchClusters, 300);
+  const debouncedFetch = useCallback(debounce(fetchClusters, 500), []);
 
   useEffect(() => {
     if (!zoomBounds) {

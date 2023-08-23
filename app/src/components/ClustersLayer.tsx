@@ -1,4 +1,6 @@
+import { Cluster } from "@/types/cluster";
 import { OperatorKey } from "@/types/operator";
+import { cell as Cell } from "@prisma/client";
 import { Icon } from "leaflet";
 import { useContext, useEffect } from "react";
 import { Marker, useMap } from "react-leaflet";
@@ -92,7 +94,7 @@ export const ClustersLayer = () => {
   return (
     <>
       {mapContext?.clusters &&
-        mapContext?.clusters.map((cluster: any, index: number) => {
+        mapContext?.clusters.map((cluster: Cluster, index: number) => {
           const [longitude, latitude] = cluster.geometry.coordinates;
           const { point_count: pointCount } = cluster.properties;
 
@@ -105,12 +107,16 @@ export const ClustersLayer = () => {
               />
             );
           } else {
-            const cell = cluster.properties;
+            const cell = cluster.properties as Cell;
             return (
               <Marker
                 key={cell.id}
                 position={[latitude, longitude]}
-                icon={cell.operator ? getIcon(cell.operator) : undefined}
+                icon={
+                  cell.operator
+                    ? getIcon(cell.operator as OperatorKey)
+                    : undefined
+                }
               >
                 <CellMarkerPopup cell={cell} />
               </Marker>

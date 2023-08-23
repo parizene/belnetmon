@@ -1,12 +1,12 @@
 import { OPERATOR_KEYS, OperatorKey } from "@/types/operator";
-import { PrismaClient } from "@prisma/client";
+import { cell as Cell, PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import Supercluster from "supercluster";
 
 const prisma = new PrismaClient();
 
 const supercluster = new Supercluster({
-  radius: 40,
+  radius: 80,
   maxZoom: 15,
 });
 
@@ -44,22 +44,24 @@ export async function GET(req: NextRequest) {
     };
   }
 
+  const t1 = performance.now();
   const cells = await prisma.cell.findMany({
     where: whereCondition,
   });
+  console.debug(`sql: ${performance.now() - t1}ms`);
 
-  supercluster.load(
-    cells.map((cell) => ({
-      type: "Feature",
-      properties: {
-        ...cell,
-      },
-      geometry: {
-        type: "Point",
-        coordinates: [cell.longitude!, cell.latitude!],
-      },
-    }))
-  );
+  const points: Supercluster.PointFeature<Cell>[] = cells.map((cell) => ({
+    type: "Feature",
+    properties: {
+      ...cell,
+    },
+    geometry: {
+      type: "Point",
+      coordinates: [cell.longitude!, cell.latitude!],
+    },
+  }));
+
+  supercluster.load(points);
 
   const clusters = supercluster.getClusters(bbox, zoom);
 
