@@ -63,35 +63,17 @@ class Mapper
         return $reg;
     }
 
-    private function getSectors($test)
-    {
+    private function getSectors($sectorsText) {
         $result = array();
-        $test = trim($test);
-        if (strstr($test, ":")) {
-            $testSplitted = explode(":", $test);
-            for ($i = 0; $i < count($testSplitted); $i++) {
-                $str = $testSplitted[$i];
-                if ($i == 0) {
-                    if ($str !== '') {
-                        $arr = str_split($str);
-                        for ($j = 0; $j < count($arr); $j++) {
-                            $sector = $arr[$j];
-                            if (is_numeric($sector)) {
-                                array_push($result, intval($sector));
-                            }
-                        }
+        $parts = explode(":", preg_replace('/\s+/', '', $sectorsText));
+        foreach ($parts as $index => $part) {
+            if ($part !== '') {
+                if ($index !== 0) {
+                    $result[] = (int)$part;
+                } else {
+                    foreach (str_split($part) as $char) {
+                        $result[] = (int)$char;
                     }
-                } else if ($str !== '' and is_numeric($str)) {
-                    array_push($result, intval($str));
-                }
-            }
-        } else if ($test !== '') {
-            $str = str_replace(' ', '', $test);
-            $arr = str_split($str);
-            for ($j = 0; $j < count($arr); $j++) {
-                $sector = $arr[$j];
-                if (is_numeric($sector)) {
-                    array_push($result, intval($sector));
                 }
             }
         }
