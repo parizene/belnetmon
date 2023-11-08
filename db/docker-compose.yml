@@ -1,6 +1,7 @@
 version: "3"
 services:
-  belnetmon-db:
+  db:
+    image: postgis/postgis:15-3.3-alpine
     container_name: belnetmon-db
     restart: unless-stopped
     environment:
@@ -8,22 +9,28 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
-      - 5432:5432
+      - 5435:5432
     volumes:
-      - belnetmon-db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - default
+      - belnetmon-network
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin
+    container_name: belnetmon-pgadmin
     restart: unless-stopped
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: root
     ports:
-      - "5050:80"
+      - "5051:80"
     volumes:
       - pgadmin-data:/var/lib/pgadmin
 volumes:
-  belnetmon-db-data:
+  db-data:
     driver: local
   pgadmin-data:
     driver: local
+networks:
+  belnetmon-network:
+    external: true

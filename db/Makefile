@@ -1,5 +1,5 @@
-up-dev:
-	docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+up-m1:
+	docker compose -p belnetmon-db -f docker-compose.yml -f docker-compose.m1.yml up -d --build
 
-up-prod:
-	docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+up:
+	docker compose -p belnetmon-db -f docker-compose.yml up -d --build

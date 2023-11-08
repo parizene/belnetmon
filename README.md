@@ -1,20 +1,5 @@
 # [belnetmon](https://belnetmon.bn.by)
 
-## app
-```
-cd app/
-```
-
-Create `.env` file:
-```
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/belnetmon?schema=public"
-```
-
-Build:
-```
-prisma generate && next build
-```
-
 ## db
 ```
 cd db/
@@ -29,9 +14,14 @@ cd scripts
 python validate.py
 ```
 
+Create network:
+```
+docker network create belnetmon-network
+```
+
 Run docker container with database:
 ```
-make up-prod
+make up
 ```
 
 Populate database with data from csv files:
@@ -42,7 +32,18 @@ npm run populate
 
 Url to view database in pgAdmin:
 ```
-http://localhost:5050/
+http://localhost:5051/
+```
+
+## app
+```
+cd app/
+make up
+```
+
+Url to view app:
+```
+http://localhost:5000/
 ```
 
 ## legacy

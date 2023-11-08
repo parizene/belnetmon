@@ -12,7 +12,7 @@ import { parseStringToNumber } from "./utils";
 const db = new Client({
   database: "belnetmon",
   host: "localhost",
-  port: 5432,
+  port: 5435,
   user: "postgres",
   password: "postgres",
 });

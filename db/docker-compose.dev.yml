@@ -1,4 +1,0 @@
-version: "3"
-services:
-  belnetmon-db:
-    image: ghcr.io/baosystems/postgis:15-3.3 # for M1
