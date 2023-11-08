@@ -43,6 +43,10 @@ process.on("SIGTERM", shutdown);
 
 const getStream = (filename: string) => {
   const parseTransformStream = getCsvParseStream().transform((row: any) => {
+    const sectors_gsm = getSectors(row.GSM);
+    const sectors_dcs = getSectors(row.DCS);
+    const sectors_3g = getSectors(row["3G S"]);
+    const sectors_u900 = getSectors(row["U-S"]);
     return {
       operator: row.OPR,
       area: row.AREA,
@@ -50,14 +54,14 @@ const getStream = (filename: string) => {
       cb: row.CB,
       lac: parseStringToNumber(row.LAC),
       cid: parseStringToNumber(row.CID),
-      sectors_gsm: getSectors(row.GSM),
-      sectors_dcs: getSectors(row.DCS),
+      sectors_gsm: toPgArrayString(sectors_gsm),
+      sectors_dcs: toPgArrayString(sectors_dcs),
       lac_3g: parseStringToNumber(row["3G L"]),
       cid_3g: parseStringToNumber(row["3G C"]),
-      sectors_3g: getSectors(row["3G S"]),
+      sectors_3g: toPgArrayString(sectors_3g),
       lac_u900: parseStringToNumber(row["U-L"]),
       cid_u900: parseStringToNumber(row.U900),
-      sectors_u900: getSectors(row["U-S"]),
+      sectors_u900: toPgArrayString(sectors_u900),
       date: getDate(row.DATE),
       address: row.ADDR,
       remark: row.REM,
@@ -70,6 +74,10 @@ const getStream = (filename: string) => {
     .createReadStream(filename)
     .pipe(parseTransformStream)
     .pipe(formatStream);
+};
+
+const toPgArrayString = (sectors: number[]) => {
+  return "{" + sectors.join(",") + "}";
 };
 
 const addNewlineTransform = () =>

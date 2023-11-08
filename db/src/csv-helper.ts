@@ -18,7 +18,7 @@ export const getDate = (dateText: string): string | undefined => {
   }
 };
 
-export const getSectors = (sectorsText: string): string => {
+export const getSectors = (sectorsText: string): number[] => {
   const result: number[] = [];
   const parts = sectorsText.replace(/\s+/g, "").split(":");
   parts.forEach((part, index) => {
@@ -28,7 +28,7 @@ export const getSectors = (sectorsText: string): string => {
       );
     }
   });
-  return "{" + result.join(",") + "}";
+  return result;
 };
 
 export const getCsvParseStream = () => {

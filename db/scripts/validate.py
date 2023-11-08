@@ -79,32 +79,36 @@ def main():
     files = os.listdir(dir_path)
 
     for file in files:
-        colored_print(f"----- {file} -----", "yellow")
+        colored_print(f"----- {file} -----", "green")
 
         file_path = os.path.join(dir_path, file)
-        df = pd.read_csv(
-            file_path,
-            delimiter=';',
-            skip_blank_lines=True,
-            comment='/',
-            quoting=3,
-            skipinitialspace=True,
-            header=0,
-            dtype=str
-        )
-
+        try:
+            df = pd.read_csv(
+                file_path,
+                delimiter=';',
+                skip_blank_lines=True,
+                comment='/',
+                quoting=3,
+                skipinitialspace=True,
+                header=0,
+                dtype=str
+            )
+        except pd.errors.ParserError as e:
+            colored_print(f"Error parsing file: {e}", "red")
+            continue
+    
         expected_columns_count = len(df.columns)
         if expected_columns_count != 22:
             colored_print("Columns count != 22", "red")
             continue
 
         df.columns = df.columns.str.strip()
-        df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+        df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
 
         for i, row in df.iterrows():
             errors = check_row_validity(row)
             if errors:
-                colored_print(f"{i + 1}: {', '.join(errors)}", "red")
+                colored_print(f"{i + 1}: {', '.join(errors)}", "red" if 'OPERATOR' in errors else "yellow")
                 print(dict(row))
 
 if __name__ == "__main__":
