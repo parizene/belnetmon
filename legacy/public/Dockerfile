@@ -8,6 +8,7 @@ RUN apt-get update
 RUN apt-get install -y --force-yes libzip-dev zip
 RUN docker-php-ext-configure zip --with-libzip
 RUN docker-php-ext-install zip
+RUN docker-php-ext-install mbstring
 
 COPY . /var/www/html
 EXPOSE 80

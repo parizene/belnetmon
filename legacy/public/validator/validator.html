@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Validate CSV Files</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse; /* Ensures borders are nicely joined */
+      }
+
+      table tr:nth-child(odd) {
+        background-color: #f9fafb; /* Lighter color for odd rows */
+      }
+
+      table tr:nth-child(even) {
+        background-color: #fff; /* White for even rows */
+      }
+
+      table th,
+      table td {
+        border: 1px solid #ddd; /* Add borders to table cells */
+        padding: 8px; /* Add some padding for text */
+        text-align: left; /* Align text to the left */
+      }
+
+      table th {
+        background-color: #f2f2f2; /* Different background for header */
+      }
+    </style>
+    <script>
+      function uploadFile() {
+        document.getElementById("result").innerHTML = "";
+
+        var formData = new FormData(document.getElementById("uploadForm"));
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "validator.php", true);
+
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            var results = JSON.parse(xhr.responseText);
+            var resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "";
+
+            results.forEach(function (result) {
+              var div = document.createElement("div");
+              div.className = "mt-4 p-4 bg-white rounded shadow-md";
+              div.innerHTML = result;
+              resultDiv.appendChild(div);
+            });
+          }
+        };
+
+        xhr.send(formData);
+        return false;
+      }
+    </script>
+  </head>
+  <body class="bg-gray-100 p-5">
+    <div class="container mx-auto">
+      <h1 class="text-2xl font-bold mb-5">Validate CSV Files</h1>
+      <form
+        id="uploadForm"
+        onsubmit="return uploadFile()"
+        class="bg-white p-6 rounded shadow-md"
+      >
+        <div class="mb-4">
+          <label
+            class="block text-gray-700 text-sm font-bold mb-2"
+            for="filesToUpload"
+          >
+            Select CSV files to upload
+          </label>
+          <input
+            type="file"
+            id="filesToUpload"
+            name="filesToUpload[]"
+            multiple
+            class="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <input
+          type="submit"
+          value="Upload CSVs"
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
+        />
+      </form>
+      <div id="result" class="mt-5"></div>
+    </div>
+  </body>
+</html>
