@@ -1,4 +1,3 @@
-version: "3"
 services:
   db:
     image: postgis/postgis:15-3.3-alpine
@@ -13,24 +12,11 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     networks:
-      - default
       - belnetmon-network
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: belnetmon-pgadmin
-    restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: root
-    ports:
-      - "5051:80"
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
+
 volumes:
   db-data:
-    driver: local
-  pgadmin-data:
-    driver: local
+
 networks:
   belnetmon-network:
     external: true

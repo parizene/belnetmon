@@ -11,6 +11,8 @@ Migrate csv files to utf-8, validate data:
 ```
 cd scripts
 ./unicode.sh
+
+pip install pandas
 python validate.py
 ```
 
@@ -24,15 +26,18 @@ Run docker container with database:
 make up
 ```
 
+Install Node.js
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+nvm --version
+nvm install --lts
+nvm use --lts
+```
+
 Populate database with data from csv files:
 ```
 npm install
 npm run populate
-```
-
-Url to view database in pgAdmin:
-```
-http://localhost:5051/
 ```
 
 ## app
@@ -49,5 +54,5 @@ http://localhost:5000/
 ## legacy
 ```
 cd legacy/
-docker-compose up -d
+docker-compose up -d --build
 ```

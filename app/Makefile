@@ -1,2 +1,7 @@
+DC=docker compose
+
 up:
-	docker compose -p belnetmon-app -f docker-compose.yml up -d --build
+	$(DC) -f docker-compose.yml up -d --build
+
+down:
+	$(DC) -f docker-compose.yml down
