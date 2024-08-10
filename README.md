@@ -46,11 +46,6 @@ cd app/
 make up
 ```
 
-Url to view app:
-```
-http://localhost:5000/
-```
-
 ## legacy
 ```
 cd legacy/

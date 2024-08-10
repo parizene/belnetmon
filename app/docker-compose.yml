@@ -1,13 +1,13 @@
 services:
   app:
-    container_name: belnetmon-app
+    container_name: belnetmon_app
     build: .
     restart: unless-stopped
     ports:
       - "5000:5000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:postgres@belnetmon-db:5432/belnetmon?schema=public
+      - DATABASE_URL=postgresql://postgres:postgres@belnetmon_db:5432/belnetmon?schema=public
     networks:
       - belnetmon-network
 

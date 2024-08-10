@@ -1,13 +1,16 @@
 DC=docker compose
+PROJECT_NAME=belnetmon
 
 up-m1:
-	$(DC) -f docker-compose.yml -f docker-compose.m1.yml up -d --build
+	$(DC) -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.m1.yml up -d --build
 
 up:
-	$(DC) -f docker-compose.yml up -d --build
+	$(DC) -p $(PROJECT_NAME) -f docker-compose.yml up -d --build
 
 down:
-	$(DC) -f docker-compose.yml down
+	$(DC) -p $(PROJECT_NAME) -f docker-compose.yml down
 
 clean:
-	$(DC) -f docker-compose.yml down -v
+	$(DC) -p $(PROJECT_NAME) -f docker-compose.yml down -v
+
+.PHONY: up-m1 up down clean
