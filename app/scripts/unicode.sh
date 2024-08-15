@@ -1,4 +1,4 @@
-find ./../csv/ -name "*.csv" -type f |
+find ./csv -name "*.csv" -type f |
   while read file; do
     echo " $file"
     mv $file $file.icv

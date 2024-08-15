@@ -7,7 +7,7 @@ services:
       - "5000:5000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:postgres@belnetmon_db:5432/belnetmon?schema=public
+      - DATABASE_URL=${DATABASE_URL}
     networks:
       - belnetmon-network
 

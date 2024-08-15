@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 import { format } from "@fast-csv/format";
 import fs from "fs";
 import MultiStream from "multistream";
@@ -6,15 +8,16 @@ import { Client } from "pg";
 import { from as copyFrom } from "pg-copy-streams";
 import { Transform } from "stream";
 
-import { getCsvParseStream, getDate, getSectors } from "./csv-helper";
-import { parseStringToNumber } from "./utils";
+import {
+  getCsvParseStream,
+  getDate,
+  getSectors,
+  isValidRow,
+  parseStringToNumber,
+} from "../src/lib/csv/csv-helper";
 
 const db = new Client({
-  database: "belnetmon",
-  host: "localhost",
-  port: 5435,
-  user: "postgres",
-  password: "postgres",
+  connectionString: process.env.POPULATE_DATABASE_URL,
 });
 
 db.connect()
@@ -43,6 +46,10 @@ process.on("SIGTERM", shutdown);
 
 const getStream = (filename: string) => {
   const parseTransformStream = getCsvParseStream().transform((row: any) => {
+    if (!isValidRow(row)) {
+      return undefined;
+    }
+
     const sectors_gsm = getSectors(row.GSM);
     const sectors_dcs = getSectors(row.DCS);
     const sectors_3g = getSectors(row["3G S"]);
@@ -101,7 +108,7 @@ const copy = async (sql: string) => {
     .filter((file) => file.isFile() && file.name.endsWith(".csv"))
     .map((file) => path.join(dir, file.name));
   const streams = csvFiles.map((filename) =>
-    getStream(filename).pipe(addNewlineTransform())
+    getStream(filename).pipe(addNewlineTransform()),
   );
 
   const combinedStream = new MultiStream(streams);
@@ -116,7 +123,7 @@ const copy = async (sql: string) => {
 
 const exists = async (): Promise<boolean> => {
   const res = await db.query(
-    "SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'cell');"
+    "SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'cell');",
   );
   return res.rows[0].exists;
 };
@@ -189,7 +196,7 @@ const main = async () => {
       }
 
       await db.query(
-        "CREATE INDEX cell_location_idx ON cell USING GIST (location);"
+        "CREATE INDEX cell_location_idx ON cell USING GIST (location);",
       );
 
       await db.query("COMMIT");

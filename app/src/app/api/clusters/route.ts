@@ -44,11 +44,16 @@ export async function GET(req: NextRequest) {
     };
   }
 
-  const t1 = performance.now();
-  const cells = await prisma.cell.findMany({
-    where: whereCondition,
-  });
-  console.debug(`sql: ${performance.now() - t1}ms`);
+  let cells: Cell[] = [];
+  try {
+    const t1 = performance.now();
+    cells = await prisma.cell.findMany({
+      where: whereCondition,
+    });
+    console.debug(`SQL query executed in ${performance.now() - t1}ms`);
+  } catch (e) {
+    console.error("Failed to fetch cells:", e);
+  }
 
   const points: Supercluster.PointFeature<Cell>[] = cells.map((cell) => ({
     type: "Feature",
