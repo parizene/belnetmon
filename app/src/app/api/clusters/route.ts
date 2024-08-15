@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     };
   }
 
-  let cells: Cell[] = [];
+  let cells: Cell[];
   try {
     const t1 = performance.now();
     cells = await prisma.cell.findMany({
@@ -53,6 +53,7 @@ export async function GET(req: NextRequest) {
     console.debug(`SQL query executed in ${performance.now() - t1}ms`);
   } catch (e) {
     console.error("Failed to fetch cells:", e);
+    return NextResponse.json([]);
   }
 
   const points: Supercluster.PointFeature<Cell>[] = cells.map((cell) => ({

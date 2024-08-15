@@ -18,7 +18,13 @@ Marker.prototype.options.icon = icon({
   // tooltipAnchor: [16, -28],
 });
 
-const Map = () => {
+interface MapProps {
+  className?: string;
+}
+
+const Map = ({
+  className = "",
+}: MapProps) => {
   const MINSK: LatLngExpression = [53.9023, 27.5615];
 
   return (
@@ -26,7 +32,8 @@ const Map = () => {
       center={MINSK}
       zoom={13}
       zoomControl={true}
-      className="h-screen"
+      className={className}
+      style={{ zIndex: 0 }}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
