@@ -1,0 +1,14 @@
+services:
+  app:
+    networks:
+      - traefik-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.belnetmon-app.rule=Host(`belnetmon.com`)"
+      - "traefik.http.routers.belnetmon-app.entrypoints=websecure"
+      - "traefik.http.routers.belnetmon-app.tls.certresolver=myresolver"
+      - "traefik.http.services.belnetmon-app.loadbalancer.server.port=5000"
+
+networks:
+  traefik-network:
+    external: true

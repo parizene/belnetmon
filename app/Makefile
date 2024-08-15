@@ -1,13 +1,24 @@
 DC=docker compose
 PROJECT_NAME=belnetmon
 
-up:
+# Development
+up-dev:
 	$(DC) -p $(PROJECT_NAME) -f docker-compose.yml up -d --build
 
-down:
+down-dev:
 	$(DC) -p $(PROJECT_NAME) -f docker-compose.yml down
 
-clean:
+clean-dev:
 	$(DC) -p $(PROJECT_NAME) -f docker-compose.yml down -v
 
-.PHONY: up down clean
+# Production
+up-prod:
+	$(DC) -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.traefik.yml up -d --build
+
+down-prod:
+	$(DC) -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.traefik.yml down
+
+clean-prod:
+	$(DC) -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.traefik.yml down -v
+
+.PHONY: up-dev down-dev clean-dev up-prod down-prod clean-prod
