@@ -10,27 +10,30 @@ datasource db {
 }
 
 model cell {
-  id           Int                       @id @default(autoincrement())
-  operator     String
-  area         String
-  city         String?
-  cb           String?
-  lac          Int?
-  cid          Int?
-  sectors_gsm  Int[]
-  sectors_dcs  Int[]
-  lac_3g       Int?
-  cid_3g       Int?
-  sectors_3g   Int[]
-  lac_u900     Int?
-  cid_u900     Int?
-  sectors_u900 Int[]
-  date         DateTime?                 @db.Date
-  address      String?
-  remark       String?
-  latitude     Float?                    @db.Real
-  longitude    Float?                    @db.Real
-  location     Unsupported("geography")?
+  id              Int                       @id @default(autoincrement())
+  operator        String
+  area            String
+  city            String?
+  cb              String?
+  lac             Int?
+  cid             Int?
+  sectors_gsm_b20 Int[]
+  sectors_dcs     Int[]
+  lac_3g_b3       Int?
+  cid_3g_b3       Int?
+  sectors_3g_b3   Int[]
+  lac_u900_b7     Int?
+  cid_u900_b7     Int?
+  sectors_u900_b7 Int[]
+  is_lte_a1       Boolean                   @default(false)
+  lte_a1_cid      Int?
+  is_ran_sharing  Boolean                   @default(false)
+  date            DateTime?                 @db.Date
+  address         String?
+  remark          String?
+  latitude        Float?                    @db.Real
+  longitude       Float?                    @db.Real
+  location        Unsupported("geography")?
 
   @@index([location], name: "cell_location_idx", type: Gist)
 }

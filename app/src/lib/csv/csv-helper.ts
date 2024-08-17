@@ -1,11 +1,11 @@
 import { parse } from "@fast-csv/parse";
-import { format, isValid, parse as parseDate } from "date-fns";
+import { isValid, parse as parseDate } from "date-fns";
 import fs from "fs";
 
 import { CsvDataModel } from "./csv-data-model";
 import { CsvParseError } from "./csv-parse-error";
 
-const isKindValid = (obj: CsvDataModel) => {
+const isKindValid = (obj: CsvDataModel): boolean => {
   if (!obj.KIND) {
     return true;
   }
@@ -13,41 +13,45 @@ const isKindValid = (obj: CsvDataModel) => {
   return "$" === obj.KIND;
 };
 
-const isOprValid = (obj: CsvDataModel) => {
+export const validOprValues = ["V", "M", "B", "4"];
+
+const isOprValid = (obj: CsvDataModel): boolean => {
   if (!obj.OPR) {
     return true;
   }
 
-  return ["V", "M", "B", "4"].includes(obj.OPR);
+  return validOprValues.includes(obj.OPR);
 };
 
-const isAreaValid = (obj: CsvDataModel) => {
+export const validAreaValues = [
+  "BRO",
+  "BR.",
+  "GOO",
+  "GO.",
+  "GRO",
+  "GR.",
+  "MIO",
+  "MI.",
+  "MOO",
+  "MO.",
+  "VIO",
+  "VI.",
+];
+
+const isAreaValid = (obj: CsvDataModel): boolean => {
   if (!obj.AREA) {
     return true;
   }
 
-  return [
-    "BRO",
-    "BR.",
-    "GOO",
-    "GO.",
-    "GRO",
-    "GR.",
-    "MIO",
-    "MI.",
-    "MOO",
-    "MO.",
-    "VIO",
-    "VI.",
-  ].includes(obj.AREA);
+  return validAreaValues.includes(obj.AREA);
 };
 
-const isDateValid = (obj: CsvDataModel) => {
+const isDateValid = (obj: CsvDataModel): boolean => {
   if (!obj.DATE) {
     return true;
   }
 
-  return getDate(obj.DATE);
+  return getDate(obj.DATE) !== null;
 };
 
 const isLocationValid = (
@@ -72,6 +76,26 @@ const isLocationValid = (
 
   return { isValid: errorColumns.length === 0, errorColumns };
 };
+
+export function isLteCidValid(area: string, cid: string) {
+  if (
+    (area === "BR." && !cid.startsWith("1")) ||
+    (area === "BRO" && !cid.startsWith("1")) ||
+    (area === "VI." && !cid.startsWith("2")) ||
+    (area === "VIO" && !cid.startsWith("2")) ||
+    (area === "GO." && !cid.startsWith("3")) ||
+    (area === "GOO" && !cid.startsWith("3")) ||
+    (area === "GR." && !cid.startsWith("4")) ||
+    (area === "GRO" && !cid.startsWith("4")) ||
+    (area === "MO." && !cid.startsWith("6")) ||
+    (area === "MOO" && !cid.startsWith("6")) ||
+    (area === "MI." && !cid.startsWith("7")) ||
+    (area === "MIO" && !cid.startsWith("7"))
+  ) {
+    return false;
+  }
+  return true;
+}
 
 export function checkRowValidity(row: CsvDataModel): string[] {
   const errorColumns: string[] = [];
@@ -100,23 +124,25 @@ export function checkRowValidity(row: CsvDataModel): string[] {
   return errorColumns;
 }
 
-export const parseStringToNumber = (str: string): number | undefined => {
+export const parseStringToNumber = (str: string): number | null => {
   const num = Number(str);
-  return !str || Number.isNaN(num) ? undefined : num;
+  return !str || Number.isNaN(num) ? null : num;
 };
 
-export const getDate = (dateText: string): string | undefined => {
+export const getDate = (dateText: string): Date | null => {
   let parsedDate = parseDate(dateText, "dd.MM.yy", new Date());
 
   if (isValid(parsedDate)) {
-    return format(parsedDate, "yyyy-MM-dd");
+    return parsedDate;
   }
 
   parsedDate = parseDate(dateText, "yyyy", new Date());
 
   if (isValid(parsedDate)) {
-    return format(parsedDate, "yyyy-MM-dd");
+    return parsedDate;
   }
+
+  return null;
 };
 
 export const getSectors = (sectorsText: string): number[] => {
