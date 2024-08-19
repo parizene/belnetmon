@@ -1,3 +1,4 @@
+import { AREA_KEYS, AreaKey } from "@/types/area";
 import { OPERATOR_KEYS, OperatorKey } from "@/types/operator";
 import { cell as Cell, PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
@@ -13,7 +14,8 @@ const supercluster = new Supercluster({
 export async function GET(req: NextRequest) {
   const _bbox = req.nextUrl.searchParams.get("bbox");
   const _zoom = req.nextUrl.searchParams.get("zoom");
-  const _operators = req.nextUrl.searchParams.get("operators");
+  const _operator = req.nextUrl.searchParams.get("operator");
+  const _area = req.nextUrl.searchParams.get("area");
 
   const bbox = (_bbox ? _bbox.split(",").map(Number) : undefined) as
     | [number, number, number, number]
@@ -24,10 +26,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json([]);
   }
 
-  const operators =
-    _operators
+  const operator =
+    _operator
       ?.split(",")
-      .filter((op) => OPERATOR_KEYS.includes(op as OperatorKey)) || [];
+      .filter((key) => OPERATOR_KEYS.includes(key as OperatorKey)) || [];
+
+  const area =
+    _area?.split(",").filter((key) => AREA_KEYS.includes(key as AreaKey)) || [];
 
   let whereCondition: any = {
     latitude: {
@@ -38,9 +43,15 @@ export async function GET(req: NextRequest) {
     },
   };
 
-  if (operators.length) {
+  if (operator.length) {
     whereCondition["operator"] = {
-      in: operators,
+      in: operator,
+    };
+  }
+
+  if (area.length) {
+    whereCondition["area"] = {
+      in: area,
     };
   }
 

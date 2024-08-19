@@ -1,14 +1,17 @@
 "use client";
 
+import { AreaKey } from "@/types/area";
 import { Cluster } from "@/types/cluster";
 import { OperatorKey } from "@/types/operator";
 import React, { createContext, useCallback, useEffect, useState } from "react";
 
 type MapContextType = {
   clusters: Cluster[];
-  operators: Record<OperatorKey, boolean>;
+  operatorMap: Record<OperatorKey, boolean>;
+  areaMap: Record<AreaKey, boolean>;
   onMapZoomBoundsChange: (zoomBounds: ZoomBounds) => void;
   onOperatorCheck: (operator: OperatorKey, checked: boolean) => void;
+  onAreaCheck: (operator: AreaKey, checked: boolean) => void;
 };
 
 export const MapContext = createContext<MapContextType | null>(null);
@@ -21,11 +24,25 @@ type ZoomBounds = {
 export const MapProvider = ({ children }: { children: React.ReactNode }) => {
   const [clusters, setClusters] = useState<Cluster[]>([]);
   const [zoomBounds, setZoomBounds] = useState<ZoomBounds | null>(null);
-  const [operators, setOperators] = useState<Record<OperatorKey, boolean>>({
+  const [operatorMap, setOperatorMap] = useState<Record<OperatorKey, boolean>>({
     M: false,
     V: false,
     B: false,
     "4": false,
+  });
+  const [areaMap, setAreaMap] = useState<Record<AreaKey, boolean>>({
+    BRO: false,
+    "BR.": false,
+    GOO: false,
+    "GO.": false,
+    GRO: false,
+    "GR.": false,
+    MIO: false,
+    "MI.": false,
+    MOO: false,
+    "MO.": false,
+    VIO: false,
+    "VI.": false,
   });
 
   const onMapZoomBoundsChange = useCallback(async (zoomBounds: ZoomBounds) => {
@@ -34,22 +51,33 @@ export const MapProvider = ({ children }: { children: React.ReactNode }) => {
 
   const onOperatorCheck = useCallback(
     async (operator: OperatorKey, checked: boolean) => {
-      setOperators((prevOperators) => ({
-        ...prevOperators,
+      setOperatorMap((prevOperatorMap) => ({
+        ...prevOperatorMap,
         [operator]: checked,
       }));
     },
     [],
   );
 
+  const onAreaCheck = useCallback(async (area: AreaKey, checked: boolean) => {
+    setAreaMap((prevAreaMap) => ({
+      ...prevAreaMap,
+      [area]: checked,
+    }));
+  }, []);
+
   const fetchClusters = async (
     zoom: number,
     bbox: number[],
-    operators: string[],
+    operatorKeys: string[],
+    areaKeys: string[],
   ) => {
     let url = `/api/clusters?bbox=${bbox.join(",")}&zoom=${zoom}`;
-    if (operators.length) {
-      url += `&operators=${operators.join(",")}`;
+    if (operatorKeys.length) {
+      url += `&operator=${operatorKeys.join(",")}`;
+    }
+    if (areaKeys.length) {
+      url += `&area=${areaKeys.join(",")}`;
     }
     const res = await fetch(url);
     if (res.ok) {
@@ -76,16 +104,32 @@ export const MapProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    const selectedOperators = Object.keys(operators)
-      .filter((key) => operators[key as OperatorKey])
+    const selectedOperatorKeys = Object.keys(operatorMap)
+      .filter((key) => operatorMap[key as OperatorKey])
       .map((key) => key as OperatorKey);
 
-    debouncedFetch(zoomBounds.zoom, zoomBounds.bbox, selectedOperators);
-  }, [zoomBounds, operators]);
+    const selectedAreaKeys = Object.keys(areaMap)
+      .filter((key) => areaMap[key as AreaKey])
+      .map((key) => key as AreaKey);
+
+    debouncedFetch(
+      zoomBounds.zoom,
+      zoomBounds.bbox,
+      selectedOperatorKeys,
+      selectedAreaKeys,
+    );
+  }, [zoomBounds, operatorMap, areaMap]);
 
   return (
     <MapContext.Provider
-      value={{ clusters, operators, onMapZoomBoundsChange, onOperatorCheck }}
+      value={{
+        clusters,
+        operatorMap,
+        areaMap,
+        onMapZoomBoundsChange,
+        onOperatorCheck,
+        onAreaCheck,
+      }}
     >
       {children}
     </MapContext.Provider>

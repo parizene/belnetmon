@@ -1,4 +1,5 @@
-import { getOperator } from "@/types/operator";
+import { getAreaText } from "@/types/area";
+import { getOperatorText } from "@/types/operator";
 import { cell as Cell } from "@prisma/client";
 import { format } from "date-fns";
 import { Popup } from "react-leaflet";
@@ -7,8 +8,8 @@ const CellMarkerPopup = ({ cell }: { cell: Cell }) => {
   return (
     <Popup>
       <div>
-        <p>{getOperator(cell.operator)}</p>
-        <p>{cell.area}</p>
+        <p>{getOperatorText(cell.operator)}</p>
+        <p>{getAreaText(cell.area)}</p>
         <p>{cell.city}</p>
         <p>{cell.cb}</p>
         {cell.lac && cell.cid && (
