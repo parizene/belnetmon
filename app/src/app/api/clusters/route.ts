@@ -26,13 +26,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json([]);
   }
 
-  const operator =
+  const operatorFilter: OperatorKey[] =
     _operator
       ?.split(",")
-      .filter((key) => OPERATOR_KEYS.includes(key as OperatorKey)) || [];
+      .filter((key): key is OperatorKey =>
+        OPERATOR_KEYS.includes(key as OperatorKey),
+      ) || [];
 
-  const area =
-    _area?.split(",").filter((key) => AREA_KEYS.includes(key as AreaKey)) || [];
+  const areaFilter: AreaKey[] =
+    _area
+      ?.split(",")
+      .filter((key): key is AreaKey => AREA_KEYS.includes(key as AreaKey)) ||
+    [];
 
   let whereCondition: any = {
     latitude: {
@@ -43,15 +48,15 @@ export async function GET(req: NextRequest) {
     },
   };
 
-  if (operator.length) {
-    whereCondition["operator"] = {
-      in: operator,
+  if (operatorFilter && operatorFilter.length) {
+    whereCondition.operator = {
+      in: operatorFilter,
     };
   }
 
-  if (area.length) {
-    whereCondition["area"] = {
-      in: area,
+  if (areaFilter && areaFilter.length) {
+    whereCondition.area = {
+      in: areaFilter,
     };
   }
 

@@ -13,6 +13,21 @@ export default function Navbar() {
             Home
           </Link>
         </Button>
+        <Button variant="link">
+          <Link href="/clf-generator" className="text-base">
+            CLF Generator
+          </Link>
+        </Button>
+        <Button variant="link">
+          <Link
+            className="text-base"
+            href="https://forum.esmasoft.com/viewforum.php?f=19"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Forum
+          </Link>
+        </Button>
       </div>
 
       <div className="flex items-center">

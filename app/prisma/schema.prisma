@@ -36,4 +36,8 @@ model cell {
   location        Unsupported("geography")?
 
   @@index([location], name: "cell_location_idx", type: Gist)
+  @@index([latitude, longitude], name: "cell_latitude_longitude_idx")
+  @@index([area], name: "cell_area_idx")
+  @@index([operator], name: "cell_operator_idx")
+  @@index([area, operator], name: "cell_area_operator_idx")
 }

@@ -11,7 +11,7 @@ type MapContextType = {
   areaMap: Record<AreaKey, boolean>;
   onMapZoomBoundsChange: (zoomBounds: ZoomBounds) => void;
   onOperatorCheck: (operator: OperatorKey, checked: boolean) => void;
-  onAreaCheck: (operator: AreaKey, checked: boolean) => void;
+  onAreaCheck: (area: AreaKey, checked: boolean) => void;
 };
 
 export const MapContext = createContext<MapContextType | null>(null);

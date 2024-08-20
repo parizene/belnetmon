@@ -33,5 +33,5 @@ next-env.d.ts
 
 
 scripts/download.sh
-csv/*.csv
+csv/
 .env
