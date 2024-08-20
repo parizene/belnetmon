@@ -7,7 +7,7 @@ import {
   OperatorKey,
 } from "@/types/operator";
 import { format } from "@fast-csv/format";
-import { PrismaClient } from "@prisma/client";
+import { cell as Cell, PrismaClient } from "@prisma/client";
 import archiver from "archiver";
 import { NextRequest, NextResponse } from "next/server";
 import { PassThrough } from "stream";
@@ -31,7 +31,10 @@ export async function POST(req: NextRequest) {
       },
     );
 
-    const whereCondition: any = {};
+    const whereCondition: {
+      operator?: { in: OperatorKey[] };
+      area?: { in: AreaKey[] };
+    } = {};
 
     if (operatorFilter && operatorFilter.length) {
       whereCondition.operator = {
@@ -52,33 +55,34 @@ export async function POST(req: NextRequest) {
     const csvFileName = "unite_v30.clf";
     archive.append(csvStream, { name: csvFileName });
 
-    const cells = await prisma.cell.findMany({ where: whereCondition });
+    let cursor: number | null = null;
+    const batchSize = 1000;
 
-    const customOrder = ["M", "V", "B", "4"];
-    cells.sort(
-      (a, b) =>
-        customOrder.indexOf(a.operator) - customOrder.indexOf(b.operator),
-    );
+    do {
+      const cells: Cell[] = await prisma.cell.findMany({
+        where: whereCondition,
+        take: batchSize,
+        skip: cursor ? 1 : 0,
+        cursor: cursor ? { id: cursor } : undefined,
+        orderBy: { id: "asc" },
+      });
 
-    cells.forEach((cell) => {
-      const clfRows = generateClfRows(cell);
-
-      if (cell.operator !== "4") {
-        clfRows.forEach((clfRow) => {
-          csvStream.write(mapClfRow(clfRow));
-        });
-      } else {
-        const operatorsToProcess =
-          operatorFilter && operatorFilter.length
+      cells.forEach((cell) => {
+        const clfRows = generateClfRows(cell);
+        if (cell.operator !== "4") {
+          clfRows.forEach((clfRow) => csvStream.write(mapClfRow(clfRow)));
+        } else {
+          const operatorsToProcess = operatorFilter?.length
             ? operatorFilter
             : FILTERABLE_OPERATOR_KEYS;
-        operatorsToProcess.forEach((op) => {
-          clfRows.forEach((clfRow) => {
-            csvStream.write(mapClfRow(clfRow, op));
-          });
-        });
-      }
-    });
+          operatorsToProcess.forEach((op) =>
+            clfRows.forEach((clfRow) => csvStream.write(mapClfRow(clfRow, op))),
+          );
+        }
+      });
+
+      cursor = cells.length > 0 ? cells[cells.length - 1].id : null;
+    } while (cursor);
 
     csvStream.end();
     await archive.finalize();
