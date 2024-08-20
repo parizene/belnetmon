@@ -49,14 +49,14 @@ export async function POST(req: NextRequest) {
     }
 
     const passThroughStream = new PassThrough();
-    const archive = archiver("zip", { zlib: { level: 9 } });
+    const archive = archiver("zip", { zlib: { level: 6 } });
 
     const csvStream = format({ headers: false, delimiter: ";" });
     const csvFileName = "unite_v30.clf";
     archive.append(csvStream, { name: csvFileName });
 
     let cursor: number | null = null;
-    const batchSize = 1000;
+    const batchSize = 5000;
 
     do {
       const cells: Cell[] = await prisma.cell.findMany({
@@ -99,6 +99,9 @@ export async function POST(req: NextRequest) {
           controller.error(err);
         });
       },
+      cancel() {
+        passThroughStream.destroy();
+      }
     });
 
     archive.pipe(passThroughStream);
