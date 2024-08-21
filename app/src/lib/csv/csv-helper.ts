@@ -1,9 +1,17 @@
 import { parse } from "@fast-csv/parse";
 import { isValid, parse as parseDate } from "date-fns";
 import fs from "fs";
+import path from "path";
 
 import { CsvDataModel } from "./csv-data-model";
 import { CsvParseError } from "./csv-parse-error";
+
+export type ValidationError = {
+  lineNumber: number;
+  row?: CsvDataModel;
+  errorColumns?: string[];
+  errorMsg?: string;
+};
 
 const isKindValid = (obj: CsvDataModel): boolean => {
   if (!obj.KIND) {
@@ -98,30 +106,97 @@ export function isLteCidValid(area: string, cid: string) {
 }
 
 export function checkRowValidity(row: CsvDataModel): string[] {
-  const errorColumns: string[] = [];
+  const errorColumns = new Set<string>();
 
   if (!isKindValid(row)) {
-    errorColumns.push("KIND");
+    errorColumns.add("KIND");
   }
 
   if (!isOprValid(row)) {
-    errorColumns.push("OPR");
+    errorColumns.add("OPR");
   }
 
   if (!isAreaValid(row)) {
-    errorColumns.push("AREA");
+    errorColumns.add("AREA");
   }
 
   if (!isDateValid(row)) {
-    errorColumns.push("DATE");
+    errorColumns.add("DATE");
   }
 
   const locationCheck = isLocationValid(row);
   if (!locationCheck.isValid) {
-    errorColumns.push(...locationCheck.errorColumns);
+    locationCheck.errorColumns.forEach((col) => errorColumns.add(col));
   }
 
-  return errorColumns;
+  if (row.OPR === "4") {
+    if (getSectors(row.DCS).length) {
+      errorColumns.add("DCS");
+    }
+
+    let cidGsm: string | undefined;
+    const sectorsGsm = getSectors(row.GSM);
+    if (sectorsGsm.length) {
+      cidGsm = row.CID;
+
+      if (!row.LAC || !cidGsm) {
+        errorColumns.add("LAC");
+        errorColumns.add("CID");
+      }
+      if (!isLteCidValid(row.AREA, cidGsm)) {
+        errorColumns.add("CID");
+      }
+    }
+
+    let cid3g: string | undefined;
+    const sectors3g = getSectors(row["3G S"]);
+    if (sectors3g.length) {
+      cid3g = row["3G C"];
+
+      if (!row["3G L"] || !cid3g) {
+        errorColumns.add("3G L");
+        errorColumns.add("3G C");
+      }
+      if (!isLteCidValid(row.AREA, cid3g)) {
+        errorColumns.add("3G C");
+      }
+    }
+
+    let cidU900: string | undefined;
+    const sectorsU900 = getSectors(row["U-S"]);
+    if (sectorsU900.length) {
+      cidU900 = row.U900;
+
+      if (!row["U-L"] || !cidU900) {
+        errorColumns.add("U-L");
+        errorColumns.add("U900");
+      }
+      if (!isLteCidValid(row.AREA, cidU900)) {
+        errorColumns.add("U900");
+      }
+    }
+
+    if (!areDefinedStringsEqual([cidGsm, cid3g, cidU900])) {
+      errorColumns.add("CID");
+      errorColumns.add("3G C");
+      errorColumns.add("U900");
+    }
+  } else if (row.CB === "v") {
+    errorColumns.add("OPR");
+  }
+
+  return Array.from(errorColumns);
+}
+
+function areDefinedStringsEqual(strings: Array<string | undefined>): boolean {
+  const definedStrings = strings.filter(
+    (str) => str !== undefined && str !== "",
+  );
+  if (definedStrings.length === 0) {
+    return true;
+  }
+
+  return definedStrings.every((str) => str === definedStrings[0]);
 }
 
 export const parseStringToNumber = (str: string): number | null => {
@@ -216,4 +291,52 @@ export const parseCsv = async (
       })
       .on("end", () => resolve(rows));
   });
+};
+
+export const validateCsvFile = async (
+  dir: string,
+  fileName: string,
+): Promise<ValidationError[]> => {
+  const filePath = path.join(dir, fileName);
+  const errors: ValidationError[] = [];
+
+  let rows: Array<CsvDataModel | undefined> = [];
+  try {
+    rows = await parseCsv(filePath);
+  } catch (error) {
+    if (error instanceof Error && error.name === "CsvParseError") {
+      const csvError = error as CsvParseError;
+      errors.push({
+        lineNumber: csvError.lineNumber,
+        errorMsg: csvError.message,
+      });
+    } else {
+      console.error("Unexpected error type:", error);
+      throw error;
+    }
+    return errors;
+  }
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row) continue;
+
+    const lineNumber = i + 2;
+    const errorColumns = new Set<string>(checkRowValidity(row));
+
+    if (
+      (fileName.startsWith("4_") && row.OPR !== "4") ||
+      (fileName.startsWith("b_") && row.OPR !== "B") ||
+      (fileName.startsWith("m_") && row.OPR !== "M") ||
+      (fileName.startsWith("v_") && row.OPR !== "V")
+    ) {
+      errorColumns.add("OPR");
+    }
+
+    if (errorColumns.size) {
+      errors.push({ lineNumber, row, errorColumns: Array.from(errorColumns) });
+    }
+  }
+
+  return errors;
 };
