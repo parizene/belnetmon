@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 import { Client } from "pg";
 
-import { cell as Cell, PrismaClient } from "@prisma/client";
+import { Cell, PrismaClient } from "@prisma/client";
 import { CsvDataModel } from "../src/lib/csv/csv-data-model";
 import {
   getDate,

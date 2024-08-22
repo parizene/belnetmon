@@ -1,6 +1,6 @@
 import { AREA_KEYS, AreaKey } from "@/types/area";
 import { OPERATOR_KEYS, OperatorKey } from "@/types/operator";
-import { cell as Cell, PrismaClient } from "@prisma/client";
+import { Cell, PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import Supercluster from "supercluster";
 

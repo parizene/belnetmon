@@ -9,7 +9,7 @@ datasource db {
   extensions = [postgis]
 }
 
-model cell {
+model Cell {
   id              Int                       @id @default(autoincrement())
   operator        String
   area            String
@@ -40,4 +40,5 @@ model cell {
   @@index([area], name: "cell_area_idx")
   @@index([operator], name: "cell_operator_idx")
   @@index([area, operator], name: "cell_area_operator_idx")
+  @@map("cell")
 }

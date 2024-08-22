@@ -7,7 +7,7 @@ import {
   OperatorKey,
 } from "@/types/operator";
 import { format } from "@fast-csv/format";
-import { cell as Cell, PrismaClient } from "@prisma/client";
+import { Cell, PrismaClient } from "@prisma/client";
 import archiver from "archiver";
 import { NextRequest, NextResponse } from "next/server";
 import { PassThrough } from "stream";
