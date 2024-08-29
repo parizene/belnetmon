@@ -1,6 +1,6 @@
 import { getAreaText } from "@/types/area";
 import { getOperatorText } from "@/types/operator";
-import { cell as Cell } from "@prisma/client";
+import { Cell } from "@prisma/client";
 import { format } from "date-fns";
 import { Popup } from "react-leaflet";
 

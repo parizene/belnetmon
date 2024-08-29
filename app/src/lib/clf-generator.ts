@@ -1,4 +1,4 @@
-import { cell as Cell } from "@prisma/client";
+import { Cell } from "@prisma/client";
 
 export type ClfRow = {
   mnc: string;

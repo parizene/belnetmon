@@ -1,6 +1,6 @@
 import { Cluster } from "@/types/cluster";
 import { OperatorKey } from "@/types/operator";
-import { cell as Cell } from "@prisma/client";
+import { Cell } from "@prisma/client";
 import { Icon } from "leaflet";
 import { useContext, useEffect } from "react";
 import { Marker, useMap } from "react-leaflet";
