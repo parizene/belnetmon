@@ -1,5 +1,7 @@
+import { AuthProvider } from "@/components/AuthContext";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import PlausibleProvider from "next-plausible";
@@ -24,10 +26,13 @@ export default function RootLayout({
       </head>
       <body className={cn(inter.className, "h-screen")}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <div className="flex h-full flex-col">
-            <Navbar />
-            <div className="flex-1">{children}</div>
-          </div>
+          <AuthProvider>
+            <div className="flex h-full flex-col">
+              <Navbar />
+              <div className="flex-1">{children}</div>
+              <Toaster />
+            </div>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
