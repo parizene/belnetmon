@@ -1,7 +1,7 @@
 "use client";
 
 import { useToast } from "@/components/ui/use-toast";
-import { getSession, onAuthStateChange, signIn, signOut, signUp } from "@/lib/supabase/authClient";
+import { getSession, signIn, signOut, signUp } from "@/lib/supabase/authServer";
 import { Session } from "@/lib/supabase/supabaseSessionMapper";
 import {
   createContext,
@@ -40,12 +40,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     initializeSession();
-
-    const unsubscribe = onAuthStateChange(setSession);
-
-    return () => {
-      unsubscribe();
-    };
   }, []);
 
   const handleSignIn = useCallback(
