@@ -266,13 +266,13 @@ export const isValidRow = (row: CsvDataModel) => {
 };
 
 export const parseCsv = async (
-  buffer: Buffer,
+  fileContent: string,
 ): Promise<Array<CsvDataModel | undefined>> => {
   return new Promise((resolve, reject) => {
     const rows: Array<CsvDataModel | undefined> = [];
     let lineNumber = 1; // header
     const expectedColumnCount = 22;
-    Readable.from(buffer)
+    Readable.from(fileContent)
       .pipe(getCsvParseStream())
       .on("error", (error) => {
         reject(new CsvParseError(error.message, lineNumber + 1));
@@ -302,13 +302,13 @@ export const parseCsv = async (
 
 export const validateCsvFile = async (
   fileName: string,
-  buffer: Buffer,
+  fileContent: string,
 ): Promise<FileValidationError[]> => {
   const errors: FileValidationError[] = [];
 
   let rows: Array<CsvDataModel | undefined> = [];
   try {
-    rows = await parseCsv(buffer);
+    rows = await parseCsv(fileContent);
   } catch (error) {
     if (error instanceof Error && error.name === "CsvParseError") {
       const csvError = error as CsvParseError;
