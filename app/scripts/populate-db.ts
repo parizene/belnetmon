@@ -118,10 +118,12 @@ const populateDb = async () => {
   }
 
   try {
-    const deleteResult = await prisma.cell.deleteMany();
-    const insertResult = await prisma.cell.createMany({
-      data: cells,
-    });
+    const [deleteResult, insertResult] = await prisma.$transaction([
+      prisma.cell.deleteMany(),
+      prisma.cell.createMany({
+        data: cells,
+      }),
+    ]);
     console.info(
       `Successfully populated database in ${performance.now() - t1}ms`,
     );
