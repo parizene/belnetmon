@@ -1,5 +1,7 @@
 import { parse } from "@fast-csv/parse";
+import * as chardet from "chardet";
 import { isValid, parse as parseDate } from "date-fns";
+import iconv from "iconv-lite";
 import { Readable } from "stream";
 
 import { CsvDataModel } from "./csv-data-model";
@@ -266,13 +268,23 @@ export const isValidRow = (row: CsvDataModel) => {
 };
 
 export const parseCsv = async (
-  fileContent: string,
+  fileBuffer: Buffer,
 ): Promise<Array<CsvDataModel | undefined>> => {
   return new Promise((resolve, reject) => {
     const rows: Array<CsvDataModel | undefined> = [];
     let lineNumber = 1; // header
     const expectedColumnCount = 22;
-    Readable.from(fileContent)
+
+    let readable: Readable;
+    const encoding = chardet.detect(fileBuffer);
+    if (encoding === "UTF-8") {
+      readable = Readable.from(fileBuffer);
+    } else {
+      const fileContent = iconv.decode(fileBuffer, "windows-1251");
+      readable = Readable.from(fileContent);
+    }
+
+    readable
       .pipe(getCsvParseStream())
       .on("error", (error) => {
         reject(new CsvParseError(error.message, lineNumber + 1));
@@ -302,13 +314,13 @@ export const parseCsv = async (
 
 export const validateCsvFile = async (
   fileName: string,
-  fileContent: string,
+  fileBuffer: Buffer,
 ): Promise<FileValidationError[]> => {
   const errors: FileValidationError[] = [];
 
   let rows: Array<CsvDataModel | undefined> = [];
   try {
-    rows = await parseCsv(fileContent);
+    rows = await parseCsv(fileBuffer);
   } catch (error) {
     if (error instanceof Error && error.name === "CsvParseError") {
       const csvError = error as CsvParseError;

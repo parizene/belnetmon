@@ -1,4 +1,3 @@
-import iconv from "iconv-lite";
 import { NextRequest, NextResponse } from "next/server";
 
 import { FILE_NAME_PREFIXES, MAX_FILE_SIZE, MAX_FILES_COUNT } from "@/config";
@@ -63,8 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const fileContent = iconv.decode(fileBuffer, "windows-1251");
-    const errors = await validateCsvFile(file.name, fileContent);
+    const errors = await validateCsvFile(file.name, fileBuffer);
     validationResults.push({ fileName: file.name, errors });
   }
 

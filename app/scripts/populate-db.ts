@@ -1,7 +1,6 @@
 require("dotenv").config();
 
 import fs from "fs";
-import iconv from "iconv-lite";
 import path from "path";
 import { Client } from "pg";
 
@@ -70,8 +69,7 @@ const populateDb = async () => {
     let rows: Array<CsvDataModel | undefined> = [];
     try {
       const fileBuffer: Buffer = await fs.promises.readFile(filePath);
-      const fileContent = iconv.decode(fileBuffer, "windows-1251");
-      rows = await parseCsv(fileContent);
+      rows = await parseCsv(fileBuffer);
     } catch (error) {
       console.error(error);
     }

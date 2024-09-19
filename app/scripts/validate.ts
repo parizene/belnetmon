@@ -1,5 +1,4 @@
 import fs from "fs";
-import iconv from "iconv-lite";
 import path from "path";
 const chalk = require("chalk");
 
@@ -12,8 +11,7 @@ const main = async () => {
     const fileName = file.name;
     const filePath = path.join(dir, fileName);
     const fileBuffer: Buffer = await fs.promises.readFile(filePath);
-    const fileContent = iconv.decode(fileBuffer, "windows-1251");
-    const errors = await validateCsvFile(fileName, fileContent);
+    const errors = await validateCsvFile(fileName, fileBuffer);
 
     if (errors.length) {
       console.log(chalk.blue(`\n${file.name}`));
