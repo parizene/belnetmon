@@ -33,8 +33,8 @@ export default function Navbar() {
           </Link>
         </Button>
         <Button variant="link">
-          <Link href="/legacy-clf-validator" className="text-base">
-            Legacy CLF Validator
+          <Link href="/legacy-csv-validator" className="text-base">
+            Legacy CSV Validator
           </Link>
         </Button>
         <Button variant="link">

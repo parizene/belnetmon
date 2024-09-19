@@ -19,7 +19,7 @@ type FileValidationResult = {
   errors: FileValidationError[];
 };
 
-const LegacyClfValidator: React.FC = () => {
+const LegacyCsvValidator: React.FC = () => {
   const { toast } = useToast();
   const [uploadData, setUploadData] = useState<FileValidationResult[]>([]);
 
@@ -133,4 +133,4 @@ const renderRowDataWithErrors = (row: CsvDataModel, errorColumns: string[]) => {
   );
 };
 
-export default LegacyClfValidator;
+export default LegacyCsvValidator;
