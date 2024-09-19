@@ -68,7 +68,8 @@ const populateDb = async () => {
 
     let rows: Array<CsvDataModel | undefined> = [];
     try {
-      rows = await parseCsv(filePath);
+      const fileBuffer: Buffer = await fs.promises.readFile(filePath);
+      rows = await parseCsv(fileBuffer);
     } catch (error) {
       console.error(error);
     }

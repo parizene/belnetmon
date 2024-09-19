@@ -1,17 +1,24 @@
 import { parse } from "@fast-csv/parse";
 import { isValid, parse as parseDate } from "date-fns";
-import fs from "fs";
-import path from "path";
+import { Readable } from "stream";
 
 import { CsvDataModel } from "./csv-data-model";
 import { CsvParseError } from "./csv-parse-error";
 
-export type ValidationError = {
+export type ParsingError = {
+  type: "parsing";
   lineNumber: number;
-  row?: CsvDataModel;
-  errorColumns?: string[];
-  errorMsg?: string;
+  errorMsg: string;
 };
+
+export type RowValidationError = {
+  type: "row_validation";
+  lineNumber: number;
+  row: CsvDataModel;
+  errorColumns: string[];
+};
+
+export type FileValidationError = ParsingError | RowValidationError;
 
 const isKindValid = (obj: CsvDataModel): boolean => {
   if (!obj.KIND) {
@@ -259,13 +266,13 @@ export const isValidRow = (row: CsvDataModel) => {
 };
 
 export const parseCsv = async (
-  filePath: string,
+  buffer: Buffer,
 ): Promise<Array<CsvDataModel | undefined>> => {
   return new Promise((resolve, reject) => {
     const rows: Array<CsvDataModel | undefined> = [];
     let lineNumber = 1; // header
     const expectedColumnCount = 22;
-    fs.createReadStream(filePath)
+    Readable.from(buffer)
       .pipe(getCsvParseStream())
       .on("error", (error) => {
         reject(new CsvParseError(error.message, lineNumber + 1));
@@ -274,7 +281,7 @@ export const parseCsv = async (
         if (headers.length !== expectedColumnCount) {
           reject(
             new CsvParseError(
-              `Unexpected Error: column header mismatch expected: ${expectedColumnCount} columns got: ${headers.length}`,
+              `Header row mismatch: expected ${expectedColumnCount} columns, but found ${headers.length} in the header. Please ensure the header row contains the correct number of columns.`,
               lineNumber,
             ),
           );
@@ -294,19 +301,19 @@ export const parseCsv = async (
 };
 
 export const validateCsvFile = async (
-  dir: string,
   fileName: string,
-): Promise<ValidationError[]> => {
-  const filePath = path.join(dir, fileName);
-  const errors: ValidationError[] = [];
+  buffer: Buffer,
+): Promise<FileValidationError[]> => {
+  const errors: FileValidationError[] = [];
 
   let rows: Array<CsvDataModel | undefined> = [];
   try {
-    rows = await parseCsv(filePath);
+    rows = await parseCsv(buffer);
   } catch (error) {
     if (error instanceof Error && error.name === "CsvParseError") {
       const csvError = error as CsvParseError;
       errors.push({
+        type: "parsing",
         lineNumber: csvError.lineNumber,
         errorMsg: csvError.message,
       });
@@ -324,19 +331,41 @@ export const validateCsvFile = async (
     const lineNumber = i + 2;
     const errorColumns = new Set<string>(checkRowValidity(row));
 
-    if (
-      (fileName.startsWith("4_") && row.OPR !== "4") ||
-      (fileName.startsWith("b_") && row.OPR !== "B") ||
-      (fileName.startsWith("m_") && row.OPR !== "M") ||
-      (fileName.startsWith("v_") && row.OPR !== "V")
-    ) {
+    if (!isOprValidForFileName(fileName, row)) {
       errorColumns.add("OPR");
     }
 
     if (errorColumns.size) {
-      errors.push({ lineNumber, row, errorColumns: Array.from(errorColumns) });
+      errors.push({
+        type: "row_validation",
+        lineNumber,
+        row,
+        errorColumns: Array.from(errorColumns),
+      });
     }
   }
 
   return errors;
+};
+
+const FILE_NAME_PREFIX_TO_OPR_MAP: { [key: string]: string } = {
+  "4_": "4",
+  b_: "B",
+  m_: "M",
+  v_: "V",
+};
+
+const isOprValidForFileName = (
+  fileName: string,
+  obj: CsvDataModel,
+): boolean => {
+  for (const prefix in FILE_NAME_PREFIX_TO_OPR_MAP) {
+    if (
+      fileName.startsWith(prefix) &&
+      obj.OPR !== FILE_NAME_PREFIX_TO_OPR_MAP[prefix]
+    ) {
+      return false;
+    }
+  }
+  return true;
 };

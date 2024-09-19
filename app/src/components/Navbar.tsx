@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
 import { useAuth } from "./AuthContext";
 import { ModeToggle } from "./ModeToggle";
 import { Button } from "./ui/button";
@@ -29,6 +30,11 @@ export default function Navbar() {
         <Button variant="link">
           <Link href="/clf-generator" className="text-base">
             CLF Generator
+          </Link>
+        </Button>
+        <Button variant="link">
+          <Link href="/legacy-clf-validator" className="text-base">
+            Legacy CLF Validator
           </Link>
         </Button>
         <Button variant="link">
