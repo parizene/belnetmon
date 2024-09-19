@@ -6,6 +6,9 @@ RED="\033[0;31m"
 YELLOW="\033[1;33m"
 RESET="\033[0m"
 
+# Get the directory where the script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 log() {
     echo -e "${YELLOW}$1${RESET}"
 }
@@ -20,10 +23,10 @@ log_error() {
 
 # Set the working directory to the project root
 log "Setting working directory to the project root."
-cd "$(dirname "$0")/.." || { log_error "Failed to set the working directory."; exit 1; }
+cd "$SCRIPT_DIR/.." || { log_error "Failed to set the working directory."; exit 1; }
 
 log "Running download script..."
-if ./scripts/download.sh; then
+if "$SCRIPT_DIR/download.sh"; then
     log_success "Download completed."
 else
     log_error "Download failed."
@@ -31,7 +34,7 @@ else
 fi
 
 log "Running fix script..."
-if ./scripts/fix.sh; then
+if "$SCRIPT_DIR/fix.sh"; then
     log_success "Fix script completed."
 else
     log_error "Fix script failed."

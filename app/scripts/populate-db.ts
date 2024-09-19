@@ -124,9 +124,12 @@ const populateDb = async () => {
         data: cells,
       }),
     ]);
-    console.info(
-      `Successfully populated database in ${performance.now() - t1}ms`,
-    );
+
+    const timeTaken = performance.now() - t1;
+
+    console.info(`Successfully populated database in ${timeTaken}ms`);
+    console.info(`Deleted: ${deleteResult.count} records`);
+    console.info(`Inserted: ${insertResult.count} records`);
 
     const report = {
       inserted: insertResult.count,
