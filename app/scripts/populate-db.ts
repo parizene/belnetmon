@@ -118,12 +118,22 @@ const populateDb = async () => {
   }
 
   try {
-    await prisma.cell.createMany({
+    const deleteResult = await prisma.cell.deleteMany();
+    const insertResult = await prisma.cell.createMany({
       data: cells,
     });
     console.info(
       `Successfully populated database in ${performance.now() - t1}ms`,
     );
+
+    const report = {
+      inserted: insertResult.count,
+      deleted: deleteResult.count,
+      timestamp: new Date().toISOString(),
+    };
+
+    const filePath = path.join(process.cwd(), "populate-db-report.json");
+    fs.writeFileSync(filePath, JSON.stringify(report, null, 2));
   } catch (error) {
     console.error("Error during bulk insert:", error);
   }

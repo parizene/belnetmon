@@ -33,5 +33,7 @@ next-env.d.ts
 
 
 scripts/download.sh
+scripts/fix.sh
 csv/
 .env
+update-report.json
