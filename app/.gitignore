@@ -37,3 +37,4 @@ scripts/fix.sh
 csv/
 .env
 update-report.json
+download-history.json

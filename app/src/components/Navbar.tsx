@@ -40,11 +40,11 @@ export default function Navbar() {
         <Button variant="link">
           <Link
             className="text-base"
-            href="https://forum.esmasoft.com/viewforum.php?f=19"
+            href="https://by.belnetmon.com"
             rel="noopener noreferrer"
             target="_blank"
           >
-            Forum
+            BY
           </Link>
         </Button>
         {auth?.session && (

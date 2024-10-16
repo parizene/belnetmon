@@ -1,32 +1,31 @@
-# [belnetmon](https://belnetmon.bn.by)
+# [belnetmon](https://belnetmon.com)
 
 ## db
+
 ```
 cd db/
 ```
 
-Place downloaded csv files in `csv` folder.
-
-Migrate csv files to utf-8, validate data:
-```
-cd scripts
-./unicode.sh
-
-pip install pandas
-python validate.py
-```
-
 Create network:
+
 ```
 docker network create belnetmon-network
 ```
 
 Run docker container with database:
+
 ```
 make up
 ```
 
-Install Node.js
+Change to app directory:
+
+```
+cd ../app
+```
+
+Install Node.js:
+
 ```
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 nvm --version
@@ -34,19 +33,41 @@ nvm install --lts
 nvm use --lts
 ```
 
-Populate database with data from csv files:
+Ensure the downloaded CSV files are placed in the `csv` folder.
+
+Install dependencies:
+
 ```
 npm install
-npm run populate
+```
+
+Validate data in CSV files and fix errors:
+
+```
+npm run validate
+```
+
+Populate database with data from CSV files:
+
+```
+npm run migrate-db
+npm run init-db
+npm run populate-db
 ```
 
 ## app
+
+Start the application:
+
 ```
 cd app/
 make up
 ```
 
 ## legacy
+
+Change to legacy directory and start the legacy system:
+
 ```
 cd legacy/
 docker-compose up -d --build
