@@ -36,19 +36,6 @@ else
     exit 1
 fi
 
-log "Running fix script..."
-if [ -f "$SCRIPT_DIR/fix.sh" ]; then
-    if "$SCRIPT_DIR/fix.sh"; then
-        log_success "Fix script completed."
-    else
-        log_error "Fix script failed."
-        exit 1
-    fi
-else
-    log_error "fix.sh not found."
-    exit 1
-fi
-
 log "Populating database..."
 if npm run populate-db; then
     log_success "Database population completed."
