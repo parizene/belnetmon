@@ -3,12 +3,18 @@ import path from "path";
 const chalk = require("chalk");
 
 import { validateCsvFile } from "../src/lib/csv/csv-helper";
+import { FILE_NAME_PREFIXES } from "../src/config";
 
 const main = async () => {
   const dir = "./csv";
   const files = await fs.promises.readdir(dir, { withFileTypes: true });
   for (const file of files) {
     const fileName = file.name;
+
+    if (!FILE_NAME_PREFIXES.some((prefix) => fileName.startsWith(prefix))) {
+      continue;
+    }
+
     const filePath = path.join(dir, fileName);
     const fileBuffer: Buffer = await fs.promises.readFile(filePath);
     const errors = await validateCsvFile(fileName, fileBuffer);
